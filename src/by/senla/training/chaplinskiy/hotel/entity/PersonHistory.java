@@ -1,4 +1,6 @@
-package by.senla.training.chaplinskiy.adminHotel;
+package by.senla.training.chaplinskiy.hotel.entity;
+
+import by.senla.training.chaplinskiy.hotel.entity.Person;
 
 import java.time.LocalDateTime;
 
@@ -25,4 +27,5 @@ public class PersonHistory {
     public LocalDateTime getCheckInDate() {
         return checkInDate;
     }
+
 }

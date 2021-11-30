@@ -1,24 +1,51 @@
-package by.senla.training.chaplinskiy.adminHotel;
+package by.senla.training.chaplinskiy.hotel.service;
+
+import by.senla.training.chaplinskiy.hotel.entity.Person;
+import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
+import by.senla.training.chaplinskiy.hotel.entity.Room;
+import by.senla.training.chaplinskiy.hotel.entity.Status;
+import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
+import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
+import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class Hotel {
+import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
 
-    private List<Room> rooms;
-    private List<Person> persons;
-    private List<Service> services;
+public class RoomServiceImpl implements RoomService {
 
-    public Hotel() {
-        this.rooms = new ArrayList<>();
-        this.persons = new ArrayList<>();
-        this.services = new ArrayList<>();
+    private static RoomService roomService = null;
+    private PersonHistoryRepository personHistoryRepository;
+    private RoomRepository roomRepository;
+
+    private RoomServiceImpl() {
+        this.roomRepository = RoomRepositoryImpl.getRoomRepository();
+        this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
+    }
+
+    public static RoomService getRoomService() {
+        if (roomService == null) {
+            roomService = new RoomServiceImpl();
+        }
+        return roomService;
+    }
+
+    public Room createRoom(Status status, int price, long id, int star, int capacityRoom) {
+        Room room = new Room(status, price, id, star, capacityRoom);
+        roomRepository.getRooms().add(room);
+        return room;
+    }
+
+    public List<Room> getRooms() {
+        return roomRepository.getRooms();
     }
 
     public List<Room> getRoomsByPriceAsc() {
+        List<Room> rooms = roomRepository.getRooms();
         Comparator<Room> comparator = new Comparator<Room>() {
             @Override
             public int compare(Room o1, Room o2) {
@@ -30,6 +57,7 @@ public class Hotel {
     }
 
     public List<Room> getRoomsByPriceDesc() {
+        List<Room> rooms = roomRepository.getRooms();
         Comparator<Room> comparator = new Comparator<Room>() {
             @Override
             public int compare(Room o1, Room o2) {
@@ -41,6 +69,7 @@ public class Hotel {
     }
 
     public List<Room> getRoomsByStarAsc() {
+        List<Room> rooms = roomRepository.getRooms();
         Comparator<Room> comparator = new Comparator<Room>() {
             @Override
             public int compare(Room o1, Room o2) {
@@ -52,6 +81,7 @@ public class Hotel {
     }
 
     public List<Room> getRoomsByStarDesc() {
+        List<Room> rooms = roomRepository.getRooms();
         Comparator<Room> comparator = new Comparator<Room>() {
             @Override
             public int compare(Room o1, Room o2) {
@@ -63,6 +93,7 @@ public class Hotel {
     }
 
     public List<Room> getRoomsByCapacityRoomAsc() {
+        List<Room> rooms = roomRepository.getRooms();
         Comparator<Room> comparator = new Comparator<Room>() {
             @Override
             public int compare(Room o1, Room o2) {
@@ -75,6 +106,7 @@ public class Hotel {
     }
 
     public List<Room> getRoomsByCapacityRoomDesc() {
+        List<Room> rooms = roomRepository.getRooms();
         Comparator<Room> comparator = new Comparator<Room>() {
             @Override
             public int compare(Room o1, Room o2) {
@@ -86,6 +118,7 @@ public class Hotel {
     }
 
     public List<Room> getAvailableRooms() {
+        List<Room> rooms = roomRepository.getRooms();
         List<Room> availableRooms = new ArrayList<>();
         for (Room i : rooms) {
             if (i.getStatus().equals(Status.AVAILABLE)) {
@@ -96,6 +129,7 @@ public class Hotel {
     }
 
     public List<Room> getAvailableRoomsByPriceAsc() {
+
         Comparator<Room> comparator = new Comparator<Room>() {
             @Override
             public int compare(Room o1, Room o2) {
@@ -168,22 +202,14 @@ public class Hotel {
     }
 
     public List<Room> getOccupiedRooms() {
+        List<Room> rooms = roomRepository.getRooms();
         List<Room> availableRooms = new ArrayList<>();
         for (Room i : rooms) {
-            if (i.getStatus().equals(Status.OCСUPIED)) {
+            if (i.getStatus().equals(OCСUPIED)) {
                 availableRooms.add(i);
             }
         }
         return availableRooms;
-    }
-
-    public List<Person> sortAbs() {
-        persons.sort(new Comparator<Person>() {
-            public int compare(Person o1, Person o2) {
-                return o1.getLastName().compareTo(o2.getLastName());
-            }
-        });
-        return persons;
     }
 
     public List<Room> getOccupiedRoomsSortByDateDesc() {
@@ -215,12 +241,8 @@ public class Hotel {
         return freeNumbers.size();
     }
 
-    public int getNumberGuests() {
-        List<Person> persons = getPersons();
-        return persons.size();
-    }
-
     public List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime) {
+        List<Room> rooms = roomRepository.getRooms();
         List<Room> result = new ArrayList<>();
         for (Room i : rooms) {
             if (i.getReleaseDate() == null || i.getReleaseDate().isBefore(localDateTime)) {
@@ -230,117 +252,15 @@ public class Hotel {
         return result;
     }
 
-    public int getTotalPrice(Person person) {
-        List<Room> personRooms = new ArrayList<>();
-        for (Room i : rooms) {
-            if (person == i.getPerson()) {
-                personRooms.add(i);
-            }
-        }
-        int price = 0;
-        if (!personRooms.isEmpty()) {
-            for (Room i : personRooms) {
-                LocalDateTime releaseDate = i.getReleaseDate();
-                LocalDateTime checkIn = i.getCheckInDate();
-                long between = ChronoUnit.DAYS.between(checkIn, releaseDate);
-                int dayPrice = i.getPrice();
-                int roomPrice = (int) between * dayPrice;
-                price += roomPrice;
-            }
+    public void addPerson(Room room, Person person, LocalDateTime checkInDate, LocalDateTime releaseDate) {
+        room.setPerson(person);
+        room.setStatus(OCСUPIED);
+        room.setReleaseDate(releaseDate);
+        room.setCheckInDate(checkInDate);
+        PersonHistory personHistory = new PersonHistory(person, releaseDate, checkInDate);
+        personHistoryRepository.addPersonHistory(personHistory);
+        room.getPersonHistories().add(personHistory);
 
-        }
-        return price;
-
-    }
-
-    public List<Room> getRooms() {
-        return rooms;
-    }
-
-    public void setRooms(List<Room> rooms) {
-        this.rooms = rooms;
-    }
-
-    public List<Person> getPersons() {
-        return persons;
-    }
-
-    public void addRum(Room room) {
-        rooms.add(room);
-    }
-
-    public void addPerson(Person person) {
-        persons.add(person);
-    }
-
-    public void removePerson(Person person) {
-        persons.remove(person);
-    }
-
-    public void checkInPerson(Person person, LocalDateTime checkInDate, LocalDateTime releaseDate) {
-        for (Room room : rooms) {
-            if (room.getStatus().equals(Status.AVAILABLE)) {
-                addPerson(person);
-                room.addPerson(person, checkInDate, releaseDate);
-                break;
-            }
-        }
-    }
-
-    public void checkOutPerson(Person person) {
-        for (Room room : rooms) {
-            if (room.getPerson().equals(person)) {
-                removePerson(person);
-                room.removePerson();
-            }
-        }
-    }
-
-
-    public List<Service> getServices() {
-        return services;
-    }
-
-    public List<Service> getServicesSortedPriceByService() {
-        Comparator<Service> comparator = new Comparator<Service>() {
-            @Override
-            public int compare(Service o1, Service o2) {
-                return o1.getPrice() > o2.getPrice() ? 1 : -1;
-            }
-
-        };
-        services.sort(comparator);
-        return services;
-    }
-
-    public List<Service> getServicesSortedByServiceType() {
-        Comparator<Service> comparator = new Comparator<Service>() {
-            @Override
-            public int compare(Service o1, Service o2) {
-                return o1.getServiceType().name().compareTo(o2.getServiceType().name());
-            }
-
-        };
-        services.sort(comparator);
-        return services;
-    }
-
-
-    public void addService(Service service) {
-        services.add(service);
-    }
-
-    public void removeService(Service service) {
-        services.remove(service);
-        for (Room room : rooms) {
-            room.getServices().remove(service);
-        }
-    }
-
-    public void addServiceToRoom(Room room, Service service) {
-        room.addService(service);
     }
 
 }
-
-

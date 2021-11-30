@@ -1,15 +1,15 @@
-package by.senla.training.chaplinskiy.adminHotel;
+package by.senla.training.chaplinskiy.hotel.entity;
 
 import java.time.LocalDateTime;
 
-public class Service {
+public class Supply {
 
     private final long id;
-    private final ServiceType serviceType;
+    private final SupplyType serviceType;
     private int price;
     private LocalDateTime serviceDateTime;
 
-    public Service(ServiceType serviceType, int price, long id, LocalDateTime serviceDateTime) {
+    public Supply(SupplyType serviceType, int price, long id, LocalDateTime serviceDateTime) {
         this.id = id;
         this.serviceType = serviceType;
         this.price = price;
@@ -24,7 +24,7 @@ public class Service {
         return id;
     }
 
-    public ServiceType getServiceType() {
+    public SupplyType getServiceType() {
         return serviceType;
     }
 
@@ -36,6 +36,5 @@ public class Service {
     public void setPrice(int price) {
         this.price = price;
     }
-
 
 }

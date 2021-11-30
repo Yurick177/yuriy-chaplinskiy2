@@ -1,4 +1,4 @@
-package by.senla.training.chaplinskiy.adminHotel;
+package by.senla.training.chaplinskiy.hotel.entity;
 
 public class Person {
 
@@ -35,4 +35,5 @@ public class Person {
     public void setAge(int age) {
         this.age = age;
     }
+
 }

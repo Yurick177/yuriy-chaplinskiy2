@@ -1,4 +1,4 @@
-package by.senla.training.chaplinskiy.adminHotel;
+package by.senla.training.chaplinskiy.hotel.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class Room {
     private Status status;
     private int price;
     private Person person;
-    private List<Service> services;
+    private List<Supply> services;
 
     public Room(Status status, int price, long id, int star, int capacityRoom) {
         this.status = status;
@@ -26,6 +26,30 @@ public class Room {
         this.star = star;
         this.capacityRoom = capacityRoom;
         this.personHistories = new ArrayList<>();
+    }
+
+    public List<PersonHistory> getPersonHistories() {
+        return personHistories;
+    }
+
+    public void setPersonHistories(List<PersonHistory> personHistories) {
+        this.personHistories = personHistories;
+    }
+
+    public void setReleaseDate(LocalDateTime releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public void setCheckInDate(LocalDateTime checkInDate) {
+        this.checkInDate = checkInDate;
+    }
+
+    public void setCapacityRoom(int capacityRoom) {
+        this.capacityRoom = capacityRoom;
+    }
+
+    public void setStar(int star) {
+        this.star = star;
     }
 
     public LocalDateTime getReleaseDate() {
@@ -48,31 +72,19 @@ public class Room {
         this.person = person;
     }
 
-    public List<Service> getServices() {
+    public List<Supply> getServices() {
         return services;
     }
 
-    public void setServices(List<Service> services) {
+    public void setServices(List<Supply> services) {
         this.services = services;
     }
 
     public Person getPerson() {
+
         return person;
     }
 
-    public void addPerson(Person person, LocalDateTime checkInDate, LocalDateTime releaseDate) {
-        this.person = person;
-        this.status = Status.OCСUPIED;
-        this.releaseDate = releaseDate;
-        this.checkInDate = checkInDate;
-        PersonHistory personHistory = new PersonHistory(person, releaseDate, this.checkInDate);
-        this.personHistories.add(personHistory);
-    }
-
-    public void removePerson() {
-        this.person = null;
-        this.status = Status.AVAILABLE;
-    }
 
     public LocalDateTime getCheckInDate() {
         return checkInDate;
@@ -102,7 +114,7 @@ public class Room {
         this.price = price;
     }
 
-    public void addService(Service service) {
+    public void addService(Supply service) {
         services.add(service);
     }
 
@@ -115,37 +127,37 @@ public class Room {
         }
     }
 
-    public List<Service> getListService(){
+    public List<Supply> getListService() {
         return services;
 
     }
 
-    public List<Service> getListServiceSortByPriceAsc(){
-        Comparator<Service> comparator = new Comparator<Service>() {
+    public List<Supply> getListServiceSortByPriceAsc() {
+        Comparator<Supply> comparator = new Comparator<Supply>() {
             @Override
-            public int compare(Service o1, Service o2) {
-                return o1.getPrice() > o2.getPrice()  ? 1 : -1;
+            public int compare(Supply o1, Supply o2) {
+                return o1.getPrice() > o2.getPrice() ? 1 : -1;
             }
         };
         services.sort(comparator);
         return services;
     }
 
-    public List<Service> getListServiceSortByPriceDesc(){
-        Comparator<Service> comparator = new Comparator<Service>() {
+    public List<Supply> getListServiceSortByPriceDesc() {
+        Comparator<Supply> comparator = new Comparator<Supply>() {
             @Override
-            public int compare(Service o1, Service o2) {
-                return o1.getPrice() < o2.getPrice()  ? 1 : -1;
+            public int compare(Supply o1, Supply o2) {
+                return o1.getPrice() < o2.getPrice() ? 1 : -1;
             }
         };
         services.sort(comparator);
         return services;
     }
 
-    public List<Service> getListServiceSortByDateAsc(){
-        Comparator<Service> comparator = new Comparator<Service>() {
+    public List<Supply> getListServiceSortByDateAsc() {
+        Comparator<Supply> comparator = new Comparator<Supply>() {
             @Override
-            public int compare(Service o1, Service o2) {
+            public int compare(Supply o1, Supply o2) {
                 return o1.getServiceDateTime().isBefore(o2.getServiceDateTime()) ? 1 : -1;
             }
         };
@@ -153,10 +165,10 @@ public class Room {
         return services;
     }
 
-    public List<Service> getListServiceSortByDateDesc(){
-        Comparator<Service> comparator = new Comparator<Service>() {
+    public List<Supply> getListServiceSortByDateDesc() {
+        Comparator<Supply> comparator = new Comparator<Supply>() {
             @Override
-            public int compare(Service o1, Service o2) {
+            public int compare(Supply o1, Supply o2) {
                 return o1.getServiceDateTime().isAfter(o2.getServiceDateTime()) ? 1 : -1;
             }
         };
