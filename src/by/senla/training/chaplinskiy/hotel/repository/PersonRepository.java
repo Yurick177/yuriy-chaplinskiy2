@@ -10,6 +10,8 @@ public interface PersonRepository {
 
     void setPersons(List<Person> persons);
 
-    void addPerson(Person person);
+    Long addPerson(Person person);
+
+    Person getPersonById(Long id);
 
 }

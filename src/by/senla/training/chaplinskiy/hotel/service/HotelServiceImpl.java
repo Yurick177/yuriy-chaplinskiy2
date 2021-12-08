@@ -1,26 +1,25 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
-import by.senla.training.chaplinskiy.hotel.entity.Hotel;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
-import by.senla.training.chaplinskiy.hotel.repository.*;
+import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
+import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
+import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
 public class HotelServiceImpl implements HotelService {
 
     private static HotelServiceImpl hotelService = null;
-    private RoomService roomService;
-    private HotelRepository hotelRepository;
-    private RoomRepository roomRepository;
-    private PersonRepository personRepository;
+    private final RoomService roomService;
+    private final RoomRepository roomRepository;
+    private final PersonRepository personRepository;
 
     private HotelServiceImpl() {
-        this.hotelRepository = HotelRepositoryImpl.getHotelRepository();
         this.roomRepository = RoomRepositoryImpl.getRoomRepository();
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
         this.roomService = RoomServiceImpl.getRoomService();
@@ -33,49 +32,63 @@ public class HotelServiceImpl implements HotelService {
         return hotelService;
     }
 
-
-    public void addRum(Room room) {
+    public void addRoom(Room room) {
         List<Room> rooms = roomRepository.getRooms();
         rooms.add(room);
     }
 
-    public void createHotel() {
-        Hotel hotel = new Hotel();
-        hotelRepository.setHotel(hotel);
-    }
-
-    public Hotel getHotel() {
-        if (hotelRepository.getHotel() == null) {
-            createHotel();
-        }
-        return hotelRepository.getHotel();
-    }
-
-    public void checkInPerson(Person person, LocalDateTime checkInDate, LocalDateTime releaseDate) {
+    public Long checkInPerson(Scanner scanner) {
         List<Room> rooms = roomRepository.getRooms();
-
         for (Room room : rooms) {
             if (room.getStatus().equals(Status.AVAILABLE)) {
-                personRepository.addPerson(person);
+                System.out.println("введите id пользователя ");
+                Long id = Long.parseLong(scanner.nextLine());
+                Person person = personRepository.getPersonById(id);
+                System.out.println("введите год.месяц.день.часы.минуты заселения");
+                String date = scanner.nextLine();
+                LocalDateTime checkInDate = getLocalDateTimeFromString(date);
+                System.out.println("введите год.месяц.день.часы.минуты выселения");
+                String date2 = scanner.nextLine();
+                LocalDateTime releaseDate = getLocalDateTimeFromString(date2);
                 roomService.addPerson(room, person, checkInDate, releaseDate);
-                break;
+                return room.getId();
             }
+        }
+        return null;
+    }
+
+    public void checkOutPerson(Scanner scanner) {
+        System.out.println("введите id клиента ");
+        Long personId = Long.parseLong(scanner.nextLine());
+        Person personById = personRepository.getPersonById(personId);
+        if (personById != null) {
+            System.out.println("введите id комнаты");
+            Long roomId = Long.parseLong(scanner.nextLine());
+            Room roomById = roomRepository.getRoomById(roomId);
+            if (roomById != null) {
+                Person person = roomById.getPerson();
+                if (person != null && person.getId().equals(personId)) {
+                    roomService.removePerson(roomById);
+                    System.out.println("выселен из комнаты");
+                } else {
+                    System.out.println("в этой комнате человек не проживает");
+                }
+            } else {
+                System.out.println("комната по id не найдена ");
+            }
+        } else {
+            System.out.println("клиент по id не найден ");
         }
     }
 
-    public void checkOutPerson(Person person) {
-        List<Room> rooms = roomRepository.getRooms();
-        for (Room room : rooms) {
-
-            if (room.getPerson() != null && room.getPerson().equals(person)) {
-                removePerson(person);
-            }
-        }
-    }
-
-    private void removePerson(Person person) {
-        List<Person> persons = personRepository.getPersons();
-        persons.remove(person);
+    private LocalDateTime getLocalDateTimeFromString(String date) {
+        String[] split = date.split("\\.");
+        int year = Integer.parseInt(split[0]);
+        int month = Integer.parseInt(split[1]);
+        int day = Integer.parseInt(split[2]);
+        int hour = Integer.parseInt(split[3]);
+        int minute = Integer.parseInt(split[4]);
+        return LocalDateTime.of(year, month, day, hour, minute);
     }
 
 }

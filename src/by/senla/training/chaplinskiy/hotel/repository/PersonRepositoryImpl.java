@@ -10,11 +10,11 @@ public class PersonRepositoryImpl implements PersonRepository {
     private List<Person> persons;
     private static PersonRepositoryImpl personRepository = null;
 
+    private PersonRepositoryImpl() {
+        this.persons = new ArrayList<>();
+    }
 
     public List<Person> getPersons() {
-        if (persons == null) {
-            persons = new ArrayList<>();
-        }
         return persons;
     }
 
@@ -29,8 +29,15 @@ public class PersonRepositoryImpl implements PersonRepository {
         return personRepository;
     }
 
-    public void addPerson(Person person) {
+    public Long addPerson(Person person) {
+        long id = persons.stream().mapToLong(Person::getId).max().orElse(0);
+        person.setId(id + 1);
         persons.add(person);
+        return person.getId();
+    }
+
+    public Person getPersonById(Long id) {
+        return persons.stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
     }
 
 }

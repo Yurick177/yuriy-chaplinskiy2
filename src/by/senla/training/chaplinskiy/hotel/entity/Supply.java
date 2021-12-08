@@ -7,7 +7,7 @@ public class Supply {
     private final long id;
     private final SupplyType serviceType;
     private int price;
-    private LocalDateTime serviceDateTime;
+    private final LocalDateTime serviceDateTime;
 
     public Supply(SupplyType serviceType, int price, long id, LocalDateTime serviceDateTime) {
         this.id = id;
@@ -27,7 +27,6 @@ public class Supply {
     public SupplyType getServiceType() {
         return serviceType;
     }
-
 
     public int getPrice() {
         return price;

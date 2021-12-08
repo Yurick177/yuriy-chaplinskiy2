@@ -12,13 +12,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
 public class PersonServiceImpl implements PersonService {
 
     private static PersonService personService = null;
-    private PersonRepository personRepository;
-    private RoomRepository roomRepository;
-
+    private final PersonRepository personRepository;
+    private final RoomRepository roomRepository;
 
     public PersonServiceImpl() {
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
@@ -32,19 +32,20 @@ public class PersonServiceImpl implements PersonService {
         return personService;
     }
 
-    public Person createPerson(String name, String lastName, int age) {
+    public Long createPerson(Scanner scanner) {
+        System.out.println("введите имя");
+        String name = scanner.nextLine();
+        System.out.println("введите фамилию");
+        String lastName = scanner.nextLine();
+        System.out.println("введите возраст");
+        int age = Integer.parseInt(scanner.nextLine());
         Person person = new Person(name, lastName, age);
-        personRepository.getPersons().add(person);
-        return person;
+        return personRepository.addPerson(person);
     }
 
     public List<Person> sortAbs() {
         List<Person> persons = personRepository.getPersons();
-        persons.sort(new Comparator<Person>() {
-            public int compare(Person o1, Person o2) {
-                return o1.getLastName().compareTo(o2.getLastName());
-            }
-        });
+        persons.sort(Comparator.comparing(Person::getLastName));
         return persons;
     }
 
@@ -53,7 +54,10 @@ public class PersonServiceImpl implements PersonService {
         return persons.size();
     }
 
-    public int getTotalPrice(Person person) {
+    public int getTotalPrice(Scanner scanner) {
+        System.out.println("введите Id клиента");
+        Long personId = Long.parseLong(scanner.nextLine());
+        Person person = personRepository.getPersonById(personId);
         List<Room> rooms = roomRepository.getRooms();
         List<Room> personRooms = new ArrayList<>();
         for (Room i : rooms) {
@@ -71,7 +75,6 @@ public class PersonServiceImpl implements PersonService {
                 int roomPrice = (int) between * dayPrice;
                 price += roomPrice;
             }
-
         }
         return price;
     }

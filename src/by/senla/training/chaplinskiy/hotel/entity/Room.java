@@ -7,12 +7,12 @@ import java.util.List;
 
 public class Room {
 
+    private final Long id;
     private List<PersonHistory> personHistories;
     private LocalDateTime releaseDate;
     private LocalDateTime checkInDate;
     private int capacityRoom;
     private int star;
-    private final long id;
     private Status status;
     private int price;
     private Person person;
@@ -26,6 +26,10 @@ public class Room {
         this.star = star;
         this.capacityRoom = capacityRoom;
         this.personHistories = new ArrayList<>();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public List<PersonHistory> getPersonHistories() {
@@ -64,10 +68,6 @@ public class Room {
         return star;
     }
 
-    public long getId() {
-        return id;
-    }
-
     public void setPerson(Person person) {
         this.person = person;
     }
@@ -84,7 +84,6 @@ public class Room {
 
         return person;
     }
-
 
     public LocalDateTime getCheckInDate() {
         return checkInDate;
@@ -133,45 +132,25 @@ public class Room {
     }
 
     public List<Supply> getListServiceSortByPriceAsc() {
-        Comparator<Supply> comparator = new Comparator<Supply>() {
-            @Override
-            public int compare(Supply o1, Supply o2) {
-                return o1.getPrice() > o2.getPrice() ? 1 : -1;
-            }
-        };
+        Comparator<Supply> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
         services.sort(comparator);
         return services;
     }
 
     public List<Supply> getListServiceSortByPriceDesc() {
-        Comparator<Supply> comparator = new Comparator<Supply>() {
-            @Override
-            public int compare(Supply o1, Supply o2) {
-                return o1.getPrice() < o2.getPrice() ? 1 : -1;
-            }
-        };
+        Comparator<Supply> comparator = (o1, o2) -> o1.getPrice() < o2.getPrice() ? 1 : -1;
         services.sort(comparator);
         return services;
     }
 
     public List<Supply> getListServiceSortByDateAsc() {
-        Comparator<Supply> comparator = new Comparator<Supply>() {
-            @Override
-            public int compare(Supply o1, Supply o2) {
-                return o1.getServiceDateTime().isBefore(o2.getServiceDateTime()) ? 1 : -1;
-            }
-        };
+        Comparator<Supply> comparator = Comparator.comparing(Supply::getServiceDateTime);
         services.sort(comparator);
         return services;
     }
 
     public List<Supply> getListServiceSortByDateDesc() {
-        Comparator<Supply> comparator = new Comparator<Supply>() {
-            @Override
-            public int compare(Supply o1, Supply o2) {
-                return o1.getServiceDateTime().isAfter(o2.getServiceDateTime()) ? 1 : -1;
-            }
-        };
+        Comparator<Supply> comparator = (o1, o2) -> o1.getServiceDateTime().compareTo(o2.getServiceDateTime()) * -1;
         services.sort(comparator);
         return services;
     }

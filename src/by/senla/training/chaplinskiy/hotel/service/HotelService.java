@@ -1,22 +1,15 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
-import by.senla.training.chaplinskiy.hotel.entity.Hotel;
-import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Scanner;
 
 public interface HotelService {
 
-    void createHotel();
+    void addRoom(Room room);
 
-    Hotel getHotel();
+    Long checkInPerson(Scanner scanner);
 
-    void addRum(Room room);
-
-    void checkInPerson(Person person, LocalDateTime checkInDate, LocalDateTime releaseDate);
-
-    void checkOutPerson(Person person);
+    void checkOutPerson(Scanner scanner);
 
 }

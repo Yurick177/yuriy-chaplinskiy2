@@ -1,150 +1,281 @@
 package by.senla.training.chaplinskiy.hotel.runner;
 
-import by.senla.training.chaplinskiy.hotel.entity.*;
+import by.senla.training.chaplinskiy.hotel.entity.Person;
+import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
+import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
-import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.menu.IAction;
+import by.senla.training.chaplinskiy.hotel.menu.Menu;
+import by.senla.training.chaplinskiy.hotel.menu.MenuItem;
+import by.senla.training.chaplinskiy.hotel.menu.Navigator;
 import by.senla.training.chaplinskiy.hotel.service.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Scanner;
 
 public class MainApp {
 
     public static void main(String[] args) {
         HotelService hotelService = HotelServiceImpl.getHotelService();
-        PersonService personService = PersonServiceImpl.getPersonService();
         RoomService roomService = RoomServiceImpl.getRoomService();
-        SupplyService supplyService = SupplyServiceImpl.getSupplyService();
-        Person person = personService.createPerson("Yuriy", "Chaplinskiy", 31);
-        Person person2 = personService.createPerson("Misha", "Chap", 21);
-        Person person3 = personService.createPerson("Grisha", "Durun", 34);
-        Room room1 = roomService.createRoom(Status.AVAILABLE, 15, 1, 2, 1);
-        Room room2 = roomService.createRoom(Status.AVAILABLE, 1000, 2, 4, 4);
-        Room room3 = roomService.createRoom(Status.AVAILABLE, 34, 3, 1, 5);
-        Hotel hotel = hotelService.getHotel();
-        hotelService.addRum(room1);
-        hotelService.addRum(room2);
-        hotelService.addRum(room3);
-        hotelService.checkInPerson(person, LocalDateTime.of(2021, 11, 19, 12, 0), LocalDateTime.of(2021, 11, 20, 12, 0));
-        hotelService.checkInPerson(person2, LocalDateTime.of(2021, 11, 20, 12, 0), LocalDateTime.of(2021, 11, 21, 12, 0));
-        hotelService.checkInPerson(person3, LocalDateTime.of(2021, 11, 22, 12, 0), LocalDateTime.of(2021, 11, 23, 12, 0));
-        hotelService.checkOutPerson(person);
-        hotelService.checkInPerson(person, LocalDateTime.of(2021, 11, 21, 12, 0), LocalDateTime.of(2021, 11, 22, 12, 0));
-        hotelService.checkOutPerson(person);
-        hotelService.checkInPerson(person, LocalDateTime.of(2021, 11, 21, 12, 0), LocalDateTime.of(2021, 11, 22, 12, 0));
-        hotelService.checkOutPerson(person);
-        hotelService.checkInPerson(person, LocalDateTime.of(2021, 11, 21, 12, 0), LocalDateTime.of(2021, 11, 22, 12, 0));
-        hotelService.checkOutPerson(person);
+        PersonService personService = PersonServiceImpl.getPersonService();
+        Scanner scan = new Scanner(System.in);
+        while (true) {
+            System.out.println("Выберите пункт действия:");
+            Navigator navigator = new Navigator();
+            Menu menu = new Menu();
 
-        List<Room> a = roomService.getRooms();
-        for (Room i : a) {
-            System.out.println("list rooms - " + i.getId());
-        }
+            MenuItem getRoomsItem = new MenuItem();
+            getRoomsItem.setTitle("1 getRooms");
+            IAction getRoom = () -> {
+                List<Room> rooms = roomService.getRooms();
+                for (Room i : rooms) {
+                    System.out.println("цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
+                }
+            };
+            getRoomsItem.setAction(getRoom);
+            menu.getMenuItems().add(getRoomsItem);
 
-        List<Room> sortRoomsByPrice = roomService.getRoomsByPriceAsc();
-        for (Room i : sortRoomsByPrice) {
-            System.out.println("sorting rooms by price - " + i.getPrice());
-        }
+            MenuItem addRoomItem = new MenuItem();
+            addRoomItem.setTitle("2 addRoom");
+            IAction addRoom = () -> {
+                roomService.createRoom(scan);
+            };
+            addRoomItem.setAction(addRoom);
+            menu.getMenuItems().add(addRoomItem);
 
-        List<Room> sortRoomsByStar = roomService.getRoomsByStarAsc();
-        for (Room i : sortRoomsByStar) {
-            System.out.println("sorting rooms by stars - " + i.getStar());
-        }
+            MenuItem createPersonItem = new MenuItem();
+            createPersonItem.setTitle("3 createPerson");
+            IAction createPerson = () -> {
+                System.out.println("create Person");
+                Long id = personService.createPerson(scan);
+                System.out.println("person id is " + id);
+            };
+            createPersonItem.setAction(createPerson);
+            menu.getMenuItems().add(createPersonItem);
 
-        List<Room> sortRoomsByCapacityRoom = roomService.getRoomsByCapacityRoomAsc();
-        for (Room i : sortRoomsByCapacityRoom) {
-            System.out.println("sorting rooms by capacity - " + i.getCapacityRoom());
-        }
+            MenuItem checkInPersonItem = new MenuItem();
+            checkInPersonItem.setTitle("4 checkInPerson");
+            IAction checkInPerson = () -> {
+                Long roomId = hotelService.checkInPerson(scan);
+                if (roomId != null) {
+                    System.out.println("человек заселен в комнату под номером " + roomId);
+                } else {
+                    System.out.println("свободных комнат нет");
+                }
+            };
+            checkInPersonItem.setAction(checkInPerson);
+            menu.getMenuItems().add(checkInPersonItem);
 
-        List<Room> sortAvailableRoomsByPrice = roomService.getAvailableRoomsByPriceAsc();
-        for (Room i : sortAvailableRoomsByPrice) {
-            System.out.println("sorting free rooms by price - " + i.getPrice());
-        }
+            MenuItem checkOutPersonItem = new MenuItem();
+            checkOutPersonItem.setTitle("5 checkOutPerson");
+            IAction checkOutPerson = () -> hotelService.checkOutPerson(scan);
+            checkOutPersonItem.setAction(checkOutPerson);
+            menu.getMenuItems().add(checkOutPersonItem);
 
-        List<Room> availableRoomsByCapacity = roomService.getAvailableRoomsByCapacityAsc();
-        for (Room i : availableRoomsByCapacity) {
-            System.out.println("list of free rooms by capacity - " + i.getCapacityRoom());
-        }
+            MenuItem sortAbsItem = new MenuItem();
+            sortAbsItem.setTitle("6 sortPersonByAbs");
+            IAction sortAbc = () -> {
+                List<Person> persons = personService.sortAbs();
+                for (Person i : persons) {
+                    System.out.println(i.getId() + " " + i.getName() + " " + i.getLastName() + " " + i.getAge());
+                }
+            };
+            sortAbsItem.setAction(sortAbc);
+            menu.getMenuItems().add(sortAbsItem);
 
-        List<Room> availableRoomsByStar = roomService.getAvailableRoomsByStarAsc();
-        for (Room i : availableRoomsByStar) {
-            System.out.println("list of available rooms by stars - " + i.getStar());
-        }
+            MenuItem getNumberGuestsItem = new MenuItem();
+            getNumberGuestsItem.setTitle("7 getNumberGuests");
+            IAction getNumberGuest = () -> System.out.println(personService.getNumberGuests());
+            getNumberGuestsItem.setAction(getNumberGuest);
+            menu.getMenuItems().add(getNumberGuestsItem);
 
-        List<Person> sortAbs = personService.sortAbs();
-        for (Person i : sortAbs) {
-            System.out.println("sorted list of guests by last name - " + i.getLastName());
-        }
+            MenuItem getTotalPriceItem = new MenuItem();
+            getTotalPriceItem.setTitle("8 getTotalPrice");
+            IAction getTotalPrice = () -> System.out.println(personService.getTotalPrice(scan));
+            getTotalPriceItem.setAction(getTotalPrice);
+            menu.getMenuItems().add(getTotalPriceItem);
 
-        List<Room> sortOccupiedRoomsSortByDate = roomService.getOccupiedRoomsSortByDateAsc();
-        for (Room i : sortOccupiedRoomsSortByDate) {
-            System.out.println("sort occupied rooms by release date - " + i.getReleaseDate());
-        }
+            MenuItem getRoomsByPriceAscItem = new MenuItem();
+            getRoomsByPriceAscItem.setTitle("9 getRoomsByPriceAsc");
+            IAction getRoomsByPriceAsc = () -> {
+                List<Room> rooms = roomService.getRoomsByPriceAsc();
+                for (Room i : rooms) {
+                    System.out.println("цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
+                }
+            };
+            getRoomsByPriceAscItem.setAction(getRoomsByPriceAsc);
+            menu.getMenuItems().add(getRoomsByPriceAscItem);
 
-        int freeNumbers = roomService.getFreeNumbers();
-        System.out.println("total number of free rooms - " + freeNumbers);
+            MenuItem getRoomsByPriceDescItem = new MenuItem();
+            getRoomsByPriceDescItem.setTitle("10 getRoomsByPriceDesc");
+            IAction getRoomsByPriceDesc = () -> {
+                List<Room> rooms = roomService.getRoomsByPriceDesc();
+                for (Room i : rooms) {
+                    System.out.println("цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
+                }
+            };
+            getRoomsByPriceDescItem.setAction(getRoomsByPriceDesc);
+            menu.getMenuItems().add(getRoomsByPriceDescItem);
 
-        int numberGuests = personService.getNumberGuests();
-        System.out.println("total number of guests - " + numberGuests);
+            MenuItem getRoomsByStarAscItem = new MenuItem();
+            getRoomsByStarAscItem.setTitle("11 getRoomsByStarAsc");
+            IAction getRoomsByStarAsc = () -> {
+                List<Room> rooms = roomService.getRoomsByStarAsc();
+                for (Room i : rooms) {
+                    System.out.println(" количество звезд " + i.getStar() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
+                }
+            };
+            getRoomsByStarAscItem.setAction(getRoomsByStarAsc);
+            menu.getMenuItems().add(getRoomsByStarAscItem);
 
-        int resul10 = roomService.getFreeNumbers();
-        System.out.println("free rooms - " + resul10);
+            MenuItem getRoomsByStarDescItem = new MenuItem();
+            getRoomsByStarDescItem.setTitle("12 getRoomsByStarDesc");
+            IAction getRoomsByStarDesc = () -> {
+                List<Room> rooms = roomService.getRoomsByStarDesc();
+                for (Room i : rooms) {
+                    System.out.println("количество звезд " + i.getStar() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
+                }
+            };
+            getRoomsByStarDescItem.setAction(getRoomsByStarDesc);
+            menu.getMenuItems().add(getRoomsByStarDescItem);
 
-        int result11 = personService.getNumberGuests();
-        System.out.println("number of guests - " + result11);
+            MenuItem getRoomsByCapacityRoomAscItem = new MenuItem();
+            getRoomsByCapacityRoomAscItem.setTitle("13 getRoomsByCapacityRoomAsc");
+            IAction getRoomsByCapacityRoomAsc = () -> {
+                List<Room> rooms = roomService.getRoomsByCapacityRoomAsc();
+                for (Room i : rooms) {
+                    System.out.println("вместимость " + i.getCapacityRoom() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " статус " + i.getStatus());
+                }
+            };
+            getRoomsByCapacityRoomAscItem.setAction(getRoomsByCapacityRoomAsc);
+            menu.getMenuItems().add(getRoomsByCapacityRoomAscItem);
+
+            MenuItem getRoomsByCapacityRoomDescItem = new MenuItem();
+            getRoomsByCapacityRoomDescItem.setTitle("14 getRoomsByCapacityRoomDesc");
+            IAction getRoomsByCapacityRoomDesc = () -> {
+                List<Room> rooms = roomService.getRoomsByCapacityRoomDesc();
+                for (Room i : rooms) {
+                    System.out.println("вместимость " + i.getCapacityRoom() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " статус " + i.getStatus());
+                }
+            };
+            getRoomsByCapacityRoomDescItem.setAction(getRoomsByCapacityRoomDesc);
+            menu.getMenuItems().add(getRoomsByCapacityRoomDescItem);
 
 
-        List<Room> result12 = roomService.getAvailableRoomsByDate(LocalDateTime.of(2021, 11, 22, 12, 0));
-        for (Room i : result12) {
-            System.out.println("available rooms by date - " + i.getId());
-        }
+            MenuItem getPersonHistoryByRoomItem = new MenuItem();
+            getPersonHistoryByRoomItem.setTitle("15 getPersonHistoryByRoomId");
+            IAction getPersonHistoryByRoomId = () -> {
+                List<PersonHistory> personHistoriesByRoomId = roomService.getPersonHistoriesByRoomId(scan);
+                for (PersonHistory i : personHistoriesByRoomId) {
+                    System.out.println(i.getPerson().getName() + " " + i.getPerson().getLastName() + " " + i.getCheckInDate() + " " + i.getReleaseDate());
+                }
+            };
+            getPersonHistoryByRoomItem.setAction(getPersonHistoryByRoomId);
+            menu.getMenuItems().add(getPersonHistoryByRoomItem);
 
-        int totalPrice = personService.getTotalPrice(person2);
-        System.out.println("amount of payment for the room - " + totalPrice);
+            MenuItem getAvailableRoomsByPriceAscItem = new MenuItem();
+            getAvailableRoomsByPriceAscItem.setTitle("16 getAvailableRoomsByPriceAsc");
+            IAction getAvailableRoomsByPriceAsc = () -> {
+                List<Room> rooms = roomService.getAvailableRoomsByPriceAsc();
+                for (Room i : rooms) {
+                    System.out.println("статус " + i.getStatus() + " цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
+                }
+            };
+            getAvailableRoomsByPriceAscItem.setAction(getAvailableRoomsByPriceAsc);
+            menu.getMenuItems().add(getAvailableRoomsByPriceAscItem);
 
-        List<PersonHistory> PersonHistories = room1.getPersonHistories(2);
-        for (PersonHistory i : PersonHistories) {
-            System.out.println("list of recent guests + name + dates of stay - " + i.getPerson().getName() + " " + i.getCheckInDate() + "    " + i.getReleaseDate());
-        }
+            MenuItem getAvailableRoomsByPriceDescItem = new MenuItem();
+            getAvailableRoomsByPriceDescItem.setTitle("17 getAvailableRoomsByPriceDesc");
+            IAction getAvailableRoomsByPriceDesc = () -> {
+                List<Room> rooms = roomService.getAvailableRoomsByPriceDesc();
+                for (Room i : rooms) {
+                    System.out.println("статус " + i.getStatus() + " цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
+                }
+            };
+            getAvailableRoomsByPriceDescItem.setAction(getAvailableRoomsByPriceDesc);
+            menu.getMenuItems().add(getAvailableRoomsByPriceDescItem);
 
+            MenuItem getAvailableRoomsByCapacityAscItem = new MenuItem();
+            getAvailableRoomsByCapacityAscItem.setTitle("18 getAvailableRoomsByCapacityAsc");
+            IAction getAvailableRoomsByCapacityAsc = () -> {
+                List<Room> rooms = roomService.getAvailableRoomsByCapacityAsc();
+                for (Room i : rooms) {
+                    System.out.println("статус " + i.getStatus() + " вместимость " + i.getCapacityRoom() + "цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
+                }
+            };
+            getAvailableRoomsByCapacityAscItem.setAction(getAvailableRoomsByCapacityAsc);
+            menu.getMenuItems().add(getAvailableRoomsByCapacityAscItem);
 
-        Supply food = new Supply(SupplyType.FOOD, 23, 1, LocalDateTime.of(2021, 11, 21, 12, 0));
-        Supply beer = new Supply(SupplyType.ALCOHOL, 5, 2, LocalDateTime.of(2021, 11, 22, 12, 0));
+            MenuItem getAvailableRoomsByCapacityDescItem = new MenuItem();
+            getAvailableRoomsByCapacityDescItem.setTitle("19  getAvailableRoomsByCapacityDesc");
+            IAction getAvailableRoomsByCapacityDesc = () -> {
+                List<Room> rooms = roomService.getAvailableRoomsByCapacityDesc();
+                for (Room i : rooms) {
+                    System.out.println("статус " + i.getStatus() + " вместимость " + i.getCapacityRoom() + "цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
+                }
+            };
+            getAvailableRoomsByCapacityDescItem.setAction(getAvailableRoomsByCapacityDesc);
+            menu.getMenuItems().add(getAvailableRoomsByCapacityDescItem);
 
-        supplyService.addSupply(food);
-        supplyService.addSupply(beer);
-        supplyService.addSupplyToRoom(room1, food);
-        supplyService.addSupplyToRoom(room1, beer);
+            MenuItem getAvailableRoomsByStarAscItem = new MenuItem();
+            getAvailableRoomsByStarAscItem.setTitle("20 getAvailableRoomsByStarAsc");
+            IAction getAvailableRoomsByStarAsc = () -> {
+                List<Room> rooms = roomService.getAvailableRoomsByStarAsc();
+                for (Room i : rooms) {
+                    System.out.println("статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
+                }
+            };
+            getAvailableRoomsByStarAscItem.setAction(getAvailableRoomsByStarAsc);
+            menu.getMenuItems().add(getAvailableRoomsByStarAscItem);
 
-        List<Supply> result15 = room1.getListService();
-        for (Supply i : result15) {
-            System.out.println("list of services in the room - " + i.getServiceType().name());
-        }
+            MenuItem getAvailableRoomsByStarDescItem = new MenuItem();
+            getAvailableRoomsByStarDescItem.setTitle("21 getAvailableRoomsByStarDesc");
+            IAction getAvailableRoomsByStarDesc = () -> {
+                List<Room> rooms = roomService.getAvailableRoomsByStarDesc();
+                for (Room i : rooms) {
+                    System.out.println("статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
+                }
+            };
+            getAvailableRoomsByStarDescItem.setAction(getAvailableRoomsByStarDesc);
+            menu.getMenuItems().add(getAvailableRoomsByStarDescItem);
 
-        List<Supply> result16 = room1.getListServiceSortByPriceAsc();
-        for (Supply i : result16) {
-            System.out.println("sorted list of guest services by price - " + i.getPrice());
-        }
+            MenuItem getOccupiedRoomsSortByDateDescItem = new MenuItem();
+            getOccupiedRoomsSortByDateDescItem.setTitle("22 getOccupiedRoomsSortByDateDesc");
+            IAction getOccupiedRoomsSortByDateDesc = () -> {
+                List<Room> rooms = roomService.getOccupiedRoomsSortByDateDesc();
+                for (Room i : rooms) {
+                    System.out.println("дата " + i.getCheckInDate() + "статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
+                }
+            };
+            getOccupiedRoomsSortByDateDescItem.setAction(getOccupiedRoomsSortByDateDesc);
+            menu.getMenuItems().add(getOccupiedRoomsSortByDateDescItem);
 
-        List<Supply> result17 = room1.getListServiceSortByDateAsc();
-        for (Supply i : result17) {
-            System.out.println("sorted list of guest services by date  - " + i.getServiceDateTime());
-        }
+            MenuItem getOccupiedRoomsSortByDateAscItem = new MenuItem();
+            getOccupiedRoomsSortByDateAscItem.setTitle("23 getOccupiedRoomsSortByDateAsc");
+            IAction getOccupiedRoomsSortByDateAsc = () -> {
+                List<Room> rooms = roomService.getOccupiedRoomsSortByDateAsc();
+                for (Room i : rooms) {
+                    System.out.println("дата " + i.getCheckInDate() + "статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
+                }
+            };
+            getOccupiedRoomsSortByDateAscItem.setAction(getOccupiedRoomsSortByDateAsc);
+            menu.getMenuItems().add(getOccupiedRoomsSortByDateAscItem);
 
-        List<Supply> result18 = supplyService.getSuppliesSortedByPrice();
-        for (Supply i : result18) {
-            System.out.println("view hotel prices sorted by price - " + i.getPrice());
-        }
+            MenuItem getFreeNumbersItem = new MenuItem();
+            getFreeNumbersItem.setTitle("24 getFreeNumbers");
+            IAction getFreeNumbers = () -> System.out.println(roomService.getFreeNumbers());
+            getFreeNumbersItem.setAction(getFreeNumbers);
+            menu.getMenuItems().add(getFreeNumbersItem);
 
-        List<Supply> result19 = supplyService.getSuppliesSortedByType();
-        for (Supply i : result19) {
-            System.out.println("view hotel services sorted by type - " + i.getServiceType());
-        }
-
-        List<Room> result20 = roomService.getRoomsByPriceAsc();
-        for (Room i : result20) {
-            System.out.println("view the prices of rooms in the hotel sorted by price - " + i.getPrice());
+            navigator.setCurrentMenu(menu);
+            navigator.printMenu();
+            System.out.println("Ведите нужную цифру");
+            String b = scan.nextLine();
+            navigator.navigate(Integer.valueOf(b));
         }
     }
-
 }
+
+

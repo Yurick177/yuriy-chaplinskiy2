@@ -13,8 +13,8 @@ import java.util.List;
 public class SupplyServiceImpl implements SupplyService {
 
     private static SupplyServiceImpl supplyService = null;
-    private SupplyRepository supplyRepository;
-    private RoomRepository roomRepository;
+    private final SupplyRepository supplyRepository;
+    private final RoomRepository roomRepository;
 
     private SupplyServiceImpl() {
         this.supplyRepository = SupplyRepositoryImpl.getSupplyRepository();
@@ -29,32 +29,19 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     public List<Supply> getSupplies() {
-        List<Supply> supplies = supplyRepository.getSupplies();
-        return supplies;
+        return supplyRepository.getSupplies();
     }
 
     public List<Supply> getSuppliesSortedByPrice() {
         List<Supply> supplies = supplyRepository.getSupplies();
-        Comparator<Supply> comparator = new Comparator<Supply>() {
-            @Override
-            public int compare(Supply o1, Supply o2) {
-                return o1.getPrice() > o2.getPrice() ? 1 : -1;
-            }
-
-        };
+        Comparator<Supply> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
         supplies.sort(comparator);
         return supplies;
     }
 
     public List<Supply> getSuppliesSortedByType() {
         List<Supply> supplies = supplyRepository.getSupplies();
-        Comparator<Supply> comparator = new Comparator<Supply>() {
-            @Override
-            public int compare(Supply o1, Supply o2) {
-                return o1.getServiceType().name().compareTo(o2.getServiceType().name());
-            }
-
-        };
+        Comparator<Supply> comparator = Comparator.comparing(o -> o.getServiceType().name());
         supplies.sort(comparator);
         return supplies;
     }
