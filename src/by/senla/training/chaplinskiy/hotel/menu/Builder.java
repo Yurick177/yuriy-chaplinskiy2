@@ -329,7 +329,7 @@ public class Builder {
         setTitleToMenu(" getByIdSupply ", getByIdSupplyItem);
         IAction getByIdSupply = () -> {
             Supply supply = supplyService.getById(scan);
-            if (supply != null){
+            if (supply != null) {
                 System.out.println(supply.getId() + " " + supply.getPrice() + " " + supply.getServiceType());
             } else {
                 System.out.println("услуги по такому id не нашли");

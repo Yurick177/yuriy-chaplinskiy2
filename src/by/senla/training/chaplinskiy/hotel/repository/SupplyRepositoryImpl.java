@@ -1,6 +1,5 @@
 package by.senla.training.chaplinskiy.hotel.repository;
 
-import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
 
 import java.util.ArrayList;
@@ -34,30 +33,30 @@ public class SupplyRepositoryImpl implements SupplyRepository {
         return supplyRepository;
     }
 
-    public List<Supply> getAll(){
+    public List<Supply> getAll() {
         return supplies;
     }
 
-    public Long addSupply(Supply supply){
+    public Long addSupply(Supply supply) {
         long id = supplies.stream().mapToLong(Supply::getId).max().orElse(0);
         supply.setId(id + 1);
         supplies.add(supply);
         return supply.getId();
     }
 
-    public void update(Supply supply){
+    public void update(Supply supply) {
         Supply currentSupply = supplies.stream().filter(a -> a.getId().equals(supply.getId())).findFirst().orElse(null);
-        if(currentSupply != null){
+        if (currentSupply != null) {
             currentSupply.setPrice(supply.getPrice());
         }
     }
 
-    public void remove(Long id){
+    public void remove(Long id) {
         List<Supply> newSupply = supplies.stream().filter(a -> !a.getId().equals(id)).collect(Collectors.toList());
         setSupplies(newSupply);
     }
 
-    public Supply getById(Long id){
+    public Supply getById(Long id) {
         return supplies.stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
     }
 

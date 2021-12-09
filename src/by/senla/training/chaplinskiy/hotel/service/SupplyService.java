@@ -1,6 +1,5 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
-import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
 
 import java.util.List;

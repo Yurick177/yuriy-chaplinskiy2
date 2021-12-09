@@ -8,7 +8,7 @@ public class RoomSupply {
     private Supply supply;
     private Long roomId;
     private Long personId;
-    private  LocalDateTime serviceDateTime;
+    private LocalDateTime serviceDateTime;
 
     public LocalDateTime getServiceDateTime() {
         return serviceDateTime;

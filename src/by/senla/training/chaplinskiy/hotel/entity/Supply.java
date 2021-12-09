@@ -1,7 +1,5 @@
 package by.senla.training.chaplinskiy.hotel.entity;
 
-import java.time.LocalDateTime;
-
 public class Supply {
 
     private Long id;
