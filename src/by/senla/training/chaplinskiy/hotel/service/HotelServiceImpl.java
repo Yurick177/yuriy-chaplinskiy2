@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
+import static by.senla.training.chaplinskiy.hotel.LocalDateTimeUtils.getLocalDateTimeFromString;
+
 public class HotelServiceImpl implements HotelService {
 
     private static HotelServiceImpl hotelService = null;
@@ -79,16 +81,6 @@ public class HotelServiceImpl implements HotelService {
         } else {
             System.out.println("клиент по id не найден ");
         }
-    }
-
-    private LocalDateTime getLocalDateTimeFromString(String date) {
-        String[] split = date.split("\\.");
-        int year = Integer.parseInt(split[0]);
-        int month = Integer.parseInt(split[1]);
-        int day = Integer.parseInt(split[2]);
-        int hour = Integer.parseInt(split[3]);
-        int minute = Integer.parseInt(split[4]);
-        return LocalDateTime.of(year, month, day, hour, minute);
     }
 
 }

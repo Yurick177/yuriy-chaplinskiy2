@@ -9,6 +9,7 @@ public class PersonHistory {
     private final LocalDateTime releaseDate;
     private final LocalDateTime checkInDate;
     private final Long roomId;
+
     public PersonHistory(Person person, LocalDateTime releaseDate, LocalDateTime checkInDate, Long roomId) {
         this.roomId = roomId;
         this.person = person;

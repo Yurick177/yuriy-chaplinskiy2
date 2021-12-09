@@ -50,7 +50,7 @@ public interface RoomService {
 
     int getFreeNumbers();
 
-    List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime);
+    List<Room> getAvailableRoomsByDate(Scanner scanner);
 
     void removePerson(Room room);
 

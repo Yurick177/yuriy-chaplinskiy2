@@ -4,19 +4,22 @@ import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
 
 import java.util.List;
+import java.util.Scanner;
 
 public interface SupplyService {
-
-    List<Supply> getSupplies();
 
     List<Supply> getSuppliesSortedByPrice();
 
     List<Supply> getSuppliesSortedByType();
 
-    void addSupply(Supply supply);
+    List<Supply> getAll();
 
-    void removeService(Supply service);
+    Long addSupply(Scanner scanner);
 
-    void addSupplyToRoom(Room room, Supply supply);
+    void update(Scanner scanner);
+
+    void remove(Scanner scanner);
+
+    Supply getById(Scanner scanner);
 
 }

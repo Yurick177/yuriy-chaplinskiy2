@@ -4,23 +4,17 @@ import java.time.LocalDateTime;
 
 public class Supply {
 
-    private final long id;
+    private Long id;
     private final SupplyType serviceType;
     private int price;
-    private final LocalDateTime serviceDateTime;
 
-    public Supply(SupplyType serviceType, int price, long id, LocalDateTime serviceDateTime) {
-        this.id = id;
+
+    public Supply(SupplyType serviceType, int price) {
         this.serviceType = serviceType;
         this.price = price;
-        this.serviceDateTime = serviceDateTime;
     }
 
-    public LocalDateTime getServiceDateTime() {
-        return serviceDateTime;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -36,4 +30,7 @@ public class Supply {
         this.price = price;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
 }

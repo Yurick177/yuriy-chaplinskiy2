@@ -117,42 +117,4 @@ public class Room {
         services.add(service);
     }
 
-    public List<PersonHistory> getPersonHistories(int lastNumber) {
-        int personHistorySize = personHistories.size();
-        if (personHistorySize < lastNumber) {
-            return personHistories;
-        } else {
-            return personHistories.subList(personHistorySize - lastNumber - 1, personHistorySize - 1);
-        }
-    }
-
-    public List<Supply> getListService() {
-        return services;
-
-    }
-
-    public List<Supply> getListServiceSortByPriceAsc() {
-        Comparator<Supply> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
-        services.sort(comparator);
-        return services;
-    }
-
-    public List<Supply> getListServiceSortByPriceDesc() {
-        Comparator<Supply> comparator = (o1, o2) -> o1.getPrice() < o2.getPrice() ? 1 : -1;
-        services.sort(comparator);
-        return services;
-    }
-
-    public List<Supply> getListServiceSortByDateAsc() {
-        Comparator<Supply> comparator = Comparator.comparing(Supply::getServiceDateTime);
-        services.sort(comparator);
-        return services;
-    }
-
-    public List<Supply> getListServiceSortByDateDesc() {
-        Comparator<Supply> comparator = (o1, o2) -> o1.getServiceDateTime().compareTo(o2.getServiceDateTime()) * -1;
-        services.sort(comparator);
-        return services;
-    }
-
 }

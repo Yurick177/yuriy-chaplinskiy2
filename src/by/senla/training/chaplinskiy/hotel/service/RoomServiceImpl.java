@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
+import static by.senla.training.chaplinskiy.hotel.LocalDateTimeUtils.getLocalDateTimeFromString;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
 
@@ -189,7 +189,10 @@ public class RoomServiceImpl implements RoomService {
         return freeNumbers.size();
     }
 
-    public List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime) {
+    public List<Room> getAvailableRoomsByDate(Scanner scanner) {
+        System.out.println("введите год.месяц.день.часы.минуты заселения");
+        String date = scanner.nextLine();
+        LocalDateTime localDateTime = getLocalDateTimeFromString(date);
         List<Room> rooms = roomRepository.getRooms();
         List<Room> result = new ArrayList<>();
         for (Room i : rooms) {
@@ -217,7 +220,7 @@ public class RoomServiceImpl implements RoomService {
         room.setStatus(AVAILABLE);
     }
 
-    public List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner){
+    public List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner) {
         System.out.println("введите id комнаты, по которой выведется история клиентов");
         long roomId = Long.parseLong(scanner.nextLine());
         return personHistoryRepository.getPersonHistoriesByRoomId(roomId);
