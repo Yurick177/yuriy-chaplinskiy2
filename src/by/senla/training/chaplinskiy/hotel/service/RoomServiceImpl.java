@@ -15,7 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
-import static by.senla.training.chaplinskiy.hotel.LocalDateTimeUtils.getLocalDateTimeFromString;
+import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
 

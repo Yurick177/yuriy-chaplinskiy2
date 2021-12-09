@@ -1,4 +1,4 @@
-package by.senla.training.chaplinskiy.hotel;
+package by.senla.training.chaplinskiy.hotel.utils;
 
 import java.time.LocalDateTime;
 

@@ -343,6 +343,6 @@ public class Builder {
     public void setTitleToMenu(String titleToMenu, MenuItem menuItem) {
         int menuItemNumber = rootMenu.getMenuItems().size() + 1;
         menuItem.setTitle(menuItemNumber + titleToMenu);
-
     }
+
 }
