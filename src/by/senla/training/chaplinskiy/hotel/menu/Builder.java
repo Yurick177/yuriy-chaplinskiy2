@@ -36,7 +36,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getRoomsItem);
 
         MenuItem addRoomItem = new MenuItem();
-        setTitleToMenu(" add room ", addRoomItem);
+        setTitleToMenu(" Add room ", addRoomItem);
         IAction addRoom = () -> {
             roomService.createRoom(scan);
         };
@@ -44,17 +44,17 @@ public class Builder {
         rootMenu.getMenuItems().add(addRoomItem);
 
         MenuItem createPersonItem = new MenuItem();
-        setTitleToMenu(" create person ", createPersonItem);
+        setTitleToMenu(" Create person ", createPersonItem);
         IAction createPerson = () -> {
-            System.out.println("create person");
+            System.out.println("Create person");
             Long id = personService.createPerson(scan);
-            System.out.println("person id is " + id);
+            System.out.println("Person id is " + id);
         };
         createPersonItem.setAction(createPerson);
         rootMenu.getMenuItems().add(createPersonItem);
 
         MenuItem checkInPersonItem = new MenuItem();
-        setTitleToMenu(" check in person ", checkInPersonItem);
+        setTitleToMenu(" Check in person ", checkInPersonItem);
         IAction checkInPerson = () -> {
             Long roomId = personService.checkInPerson(scan);
             if (roomId != null) {
@@ -67,13 +67,13 @@ public class Builder {
         rootMenu.getMenuItems().add(checkInPersonItem);
 
         MenuItem checkOutPersonItem = new MenuItem();
-        setTitleToMenu(" check out person ", checkOutPersonItem);
+        setTitleToMenu(" Check out person ", checkOutPersonItem);
         IAction checkOutPerson = () -> personService.checkOutPerson(scan);
         checkOutPersonItem.setAction(checkOutPerson);
         rootMenu.getMenuItems().add(checkOutPersonItem);
 
         MenuItem sortAbsItem = new MenuItem();
-        setTitleToMenu(" sort person by abs ", sortAbsItem);
+        setTitleToMenu(" Sort person by abs ", sortAbsItem);
         IAction sortAbc = () -> {
             List<Person> persons = personService.sortAbs();
             for (Person i : persons) {
@@ -84,19 +84,19 @@ public class Builder {
         rootMenu.getMenuItems().add(sortAbsItem);
 
         MenuItem getNumberGuestsItem = new MenuItem();
-        setTitleToMenu(" show list guests ", getNumberGuestsItem);
+        setTitleToMenu(" Show list guests ", getNumberGuestsItem);
         IAction getNumberGuest = () -> System.out.println(personService.getNumberGuests());
         getNumberGuestsItem.setAction(getNumberGuest);
         rootMenu.getMenuItems().add(getNumberGuestsItem);
 
         MenuItem getTotalPriceItem = new MenuItem();
-        setTitleToMenu(" show total price ", getTotalPriceItem);
+        setTitleToMenu(" Show total price ", getTotalPriceItem);
         IAction getTotalPrice = () -> System.out.println(personService.getTotalPrice(scan));
         getTotalPriceItem.setAction(getTotalPrice);
         rootMenu.getMenuItems().add(getTotalPriceItem);
 
         MenuItem getRoomsByPriceAscItem = new MenuItem();
-        setTitleToMenu(" show list rooms sort by price asc ", getRoomsByPriceAscItem);
+        setTitleToMenu(" Show list rooms sort by price asc ", getRoomsByPriceAscItem);
         IAction getRoomsByPriceAsc = () -> {
             List<Room> rooms = roomService.getRoomsByPriceAsc();
             for (Room i : rooms) {
@@ -107,7 +107,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getRoomsByPriceAscItem);
 
         MenuItem getRoomsByPriceDescItem = new MenuItem();
-        setTitleToMenu(" show list rooms sort by price desc ", getRoomsByPriceDescItem);
+        setTitleToMenu(" Show list rooms sort by price desc ", getRoomsByPriceDescItem);
         IAction getRoomsByPriceDesc = () -> {
             List<Room> rooms = roomService.getRoomsByPriceDesc();
             for (Room i : rooms) {
@@ -118,7 +118,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getRoomsByPriceDescItem);
 
         MenuItem getRoomsByStarAscItem = new MenuItem();
-        setTitleToMenu(" show list rooms sort by star asc ", getRoomsByStarAscItem);
+        setTitleToMenu(" Show list rooms sort by star asc ", getRoomsByStarAscItem);
         IAction getRoomsByStarAsc = () -> {
             List<Room> rooms = roomService.getRoomsByStarAsc();
             for (Room i : rooms) {
@@ -129,7 +129,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getRoomsByStarAscItem);
 
         MenuItem getRoomsByStarDescItem = new MenuItem();
-        setTitleToMenu(" show list rooms sort by star desc ", getRoomsByStarDescItem);
+        setTitleToMenu(" Show list rooms sort by star desc ", getRoomsByStarDescItem);
         IAction getRoomsByStarDesc = () -> {
             List<Room> rooms = roomService.getRoomsByStarDesc();
             for (Room i : rooms) {
@@ -140,7 +140,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getRoomsByStarDescItem);
 
         MenuItem getRoomsByCapacityRoomAscItem = new MenuItem();
-        setTitleToMenu(" show list rooms sort by capacity asc ", getRoomsByCapacityRoomAscItem);
+        setTitleToMenu(" Show list rooms sort by capacity asc ", getRoomsByCapacityRoomAscItem);
         IAction getRoomsByCapacityRoomAsc = () -> {
             List<Room> rooms = roomService.getRoomsByCapacityRoomAsc();
             for (Room i : rooms) {
@@ -151,7 +151,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getRoomsByCapacityRoomAscItem);
 
         MenuItem getRoomsByCapacityRoomDescItem = new MenuItem();
-        setTitleToMenu(" show list rooms sort by capacity desc ", getRoomsByCapacityRoomDescItem);
+        setTitleToMenu(" Show list rooms sort by capacity desc ", getRoomsByCapacityRoomDescItem);
         IAction getRoomsByCapacityRoomDesc = () -> {
             List<Room> rooms = roomService.getRoomsByCapacityRoomDesc();
             for (Room i : rooms) {
@@ -163,7 +163,7 @@ public class Builder {
 
 
         MenuItem getPersonHistoryByRoomItem = new MenuItem();
-        setTitleToMenu(" show person history by room id ", getPersonHistoryByRoomItem);
+        setTitleToMenu(" Show person history by room id ", getPersonHistoryByRoomItem);
         IAction getPersonHistoryByRoomId = () -> {
             List<PersonHistory> personHistoriesByRoomId = roomService.getPersonHistoriesByRoomId(scan);
             for (PersonHistory i : personHistoriesByRoomId) {
@@ -174,7 +174,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getPersonHistoryByRoomItem);
 
         MenuItem getAvailableRoomsByPriceAscItem = new MenuItem();
-        setTitleToMenu(" show available rooms by price asc ", getAvailableRoomsByPriceAscItem);
+        setTitleToMenu(" Show available rooms by price asc ", getAvailableRoomsByPriceAscItem);
         IAction getAvailableRoomsByPriceAsc = () -> {
             List<Room> rooms = roomService.getAvailableRoomsByPriceAsc();
             for (Room i : rooms) {
@@ -185,7 +185,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getAvailableRoomsByPriceAscItem);
 
         MenuItem getAvailableRoomsByPriceDescItem = new MenuItem();
-        setTitleToMenu(" show available rooms by price desc ", getAvailableRoomsByPriceDescItem);
+        setTitleToMenu(" Show available rooms by price desc ", getAvailableRoomsByPriceDescItem);
         IAction getAvailableRoomsByPriceDesc = () -> {
             List<Room> rooms = roomService.getAvailableRoomsByPriceDesc();
             for (Room i : rooms) {
@@ -196,7 +196,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getAvailableRoomsByPriceDescItem);
 
         MenuItem getAvailableRoomsByCapacityAscItem = new MenuItem();
-        setTitleToMenu(" show available rooms by capacity asc ", getAvailableRoomsByCapacityAscItem);
+        setTitleToMenu(" Show available rooms by capacity asc ", getAvailableRoomsByCapacityAscItem);
         IAction getAvailableRoomsByCapacityAsc = () -> {
             List<Room> rooms = roomService.getAvailableRoomsByCapacityAsc();
             for (Room i : rooms) {
@@ -207,7 +207,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getAvailableRoomsByCapacityAscItem);
 
         MenuItem getAvailableRoomsByCapacityDescItem = new MenuItem();
-        setTitleToMenu(" show available rooms by capacity desc ", getAvailableRoomsByCapacityDescItem);
+        setTitleToMenu(" Show available rooms by capacity desc ", getAvailableRoomsByCapacityDescItem);
         IAction getAvailableRoomsByCapacityDesc = () -> {
             List<Room> rooms = roomService.getAvailableRoomsByCapacityDesc();
             for (Room i : rooms) {
@@ -218,7 +218,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getAvailableRoomsByCapacityDescItem);
 
         MenuItem getAvailableRoomsByStarAscItem = new MenuItem();
-        setTitleToMenu(" show available rooms by star asc ", getAvailableRoomsByStarAscItem);
+        setTitleToMenu(" Show available rooms by star asc ", getAvailableRoomsByStarAscItem);
         IAction getAvailableRoomsByStarAsc = () -> {
             List<Room> rooms = roomService.getAvailableRoomsByStarAsc();
             for (Room i : rooms) {
@@ -229,7 +229,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getAvailableRoomsByStarAscItem);
 
         MenuItem getAvailableRoomsByStarDescItem = new MenuItem();
-        setTitleToMenu(" show available rooms by star desc ", getAvailableRoomsByStarDescItem);
+        setTitleToMenu(" Show available rooms by star desc ", getAvailableRoomsByStarDescItem);
         IAction getAvailableRoomsByStarDesc = () -> {
             List<Room> rooms = roomService.getAvailableRoomsByStarDesc();
             for (Room i : rooms) {
@@ -240,7 +240,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getAvailableRoomsByStarDescItem);
 
         MenuItem getOccupiedRoomsSortByDateDescItem = new MenuItem();
-        setTitleToMenu(" show occupied rooms sort By date desc ", getOccupiedRoomsSortByDateDescItem);
+        setTitleToMenu(" Show occupied rooms sort By date desc ", getOccupiedRoomsSortByDateDescItem);
         IAction getOccupiedRoomsSortByDateDesc = () -> {
             List<Room> rooms = roomService.getOccupiedRoomsSortByDateDesc();
             for (Room i : rooms) {
@@ -251,7 +251,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getOccupiedRoomsSortByDateDescItem);
 
         MenuItem getOccupiedRoomsSortByDateAscItem = new MenuItem();
-        setTitleToMenu(" show occupied rooms sort By date desc ", getOccupiedRoomsSortByDateAscItem);
+        setTitleToMenu(" Show occupied rooms sort By date desc ", getOccupiedRoomsSortByDateAscItem);
         IAction getOccupiedRoomsSortByDateAsc = () -> {
             List<Room> rooms = roomService.getOccupiedRoomsSortByDateAsc();
             for (Room i : rooms) {
@@ -262,19 +262,19 @@ public class Builder {
         rootMenu.getMenuItems().add(getOccupiedRoomsSortByDateAscItem);
 
         MenuItem getAvailableRoomsByDateItem = new MenuItem();
-        setTitleToMenu(" show available rooms by date ", getAvailableRoomsByDateItem);
+        setTitleToMenu(" Show available rooms by date ", getAvailableRoomsByDateItem);
         IAction getAvailableRoomsByDate = () -> roomService.getAvailableRoomsByDate(scan);
         getAvailableRoomsByDateItem.setAction(getAvailableRoomsByDate);
         rootMenu.getMenuItems().add(getAvailableRoomsByDateItem);
 
         MenuItem getFreeNumbersItem = new MenuItem();
-        setTitleToMenu(" show list free numbers ", getFreeNumbersItem);
+        setTitleToMenu(" Show list free numbers ", getFreeNumbersItem);
         IAction getFreeNumbers = () -> System.out.println(roomService.getFreeNumbers());
         getFreeNumbersItem.setAction(getFreeNumbers);
         rootMenu.getMenuItems().add(getFreeNumbersItem);
 
         MenuItem getSuppliesSortedByPriceItem = new MenuItem();
-        setTitleToMenu(" show supplies sorted by price ", getSuppliesSortedByPriceItem);
+        setTitleToMenu(" Show supplies sorted by price ", getSuppliesSortedByPriceItem);
         IAction getSuppliesSortedByPrice = () -> {
             List<Supply> supply = supplyService.getSuppliesSortedByPrice();
             for (Supply i : supply) {
@@ -285,7 +285,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getSuppliesSortedByPriceItem);
 
         MenuItem getSuppliesSortedByTypeItem = new MenuItem();
-        setTitleToMenu(" show supplies sorted by type ", getSuppliesSortedByTypeItem);
+        setTitleToMenu(" Show supplies sorted by type ", getSuppliesSortedByTypeItem);
         IAction getSuppliesSortedByType = () -> {
             List<Supply> supply = supplyService.getSuppliesSortedByType();
             for (Supply i : supply) {
@@ -296,7 +296,7 @@ public class Builder {
         rootMenu.getMenuItems().add(getSuppliesSortedByTypeItem);
 
         MenuItem getAllSupplyItem = new MenuItem();
-        setTitleToMenu(" show all supply ", getAllSupplyItem);
+        setTitleToMenu(" Show all supply ", getAllSupplyItem);
         IAction getAllSupply = () -> {
             List<Supply> supplies = supplyService.getAll();
             for (Supply i : supplies) {
@@ -307,25 +307,25 @@ public class Builder {
         rootMenu.getMenuItems().add(getAllSupplyItem);
 
         MenuItem addSupplyItem = new MenuItem();
-        setTitleToMenu(" add supply ", addSupplyItem);
+        setTitleToMenu(" Add supply ", addSupplyItem);
         IAction addSupply = () -> System.out.println(supplyService.addSupply(scan));
         addSupplyItem.setAction(addSupply);
         rootMenu.getMenuItems().add(addSupplyItem);
 
         MenuItem updateSupplyItem = new MenuItem();
-        setTitleToMenu(" update supply ", updateSupplyItem);
+        setTitleToMenu(" Update supply ", updateSupplyItem);
         IAction updateSupply = () -> supplyService.update(scan);
         updateSupplyItem.setAction(updateSupply);
         rootMenu.getMenuItems().add(updateSupplyItem);
 
         MenuItem removeSupplyItem = new MenuItem();
-        setTitleToMenu(" remove supply ", removeSupplyItem);
+        setTitleToMenu(" Remove supply ", removeSupplyItem);
         IAction removeSupply = () -> supplyService.remove(scan);
         removeSupplyItem.setAction(removeSupply);
         rootMenu.getMenuItems().add(removeSupplyItem);
 
         MenuItem getByIdSupplyItem = new MenuItem();
-        setTitleToMenu(" show by id supply ", getByIdSupplyItem);
+        setTitleToMenu(" Show by id supply ", getByIdSupplyItem);
         IAction getByIdSupply = () -> {
             Supply supply = supplyService.getById(scan);
             if (supply != null) {
