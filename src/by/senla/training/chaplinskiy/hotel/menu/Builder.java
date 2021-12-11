@@ -1,5 +1,6 @@
 package by.senla.training.chaplinskiy.hotel.menu;
 
+import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
@@ -16,6 +17,7 @@ public class Builder {
     private final RoomService roomService = RoomServiceImpl.getRoomService();
     private final PersonService personService = PersonServiceImpl.getPersonService();
     private final SupplyService supplyService = SupplyServiceImpl.getSupplyService();
+    private final PersonHistoryService personHistoryService = PersonHistoryServiceImpl.getPersonHistoryService();
     private final Scanner scan = new Scanner(System.in);
 
     public Menu getRootMenu() {
@@ -277,9 +279,9 @@ public class Builder {
         MenuItem getPersonHistoryByRoomItem = new MenuItem();
         getPersonHistoryByRoomItem.setTitle(" 9 Show person history by room id ");
         IAction getPersonHistoryByRoomId = () -> {
-            List<PersonHistory> personHistoriesByRoomId = roomService.getPersonHistoriesByRoomId(scan);
-            for (PersonHistory i : personHistoriesByRoomId) {
-                System.out.println(i.getPerson().getName() + " " + i.getPerson().getLastName() + " " + i.getCheckInDate() + " " + i.getReleaseDate());
+            List<PersonHistoryDto> personHistoriesByRoomId = personHistoryService.getPersonHistoriesByRoomId(scan);
+            for (PersonHistoryDto i : personHistoriesByRoomId) {
+                System.out.println(i.getPersonFirstName() + " " + i.getPersonLastName() + " " + i.getCheckInDate() + " " + i.getReleaseDate());
             }
         };
         getPersonHistoryByRoomItem.setAction(getPersonHistoryByRoomId);

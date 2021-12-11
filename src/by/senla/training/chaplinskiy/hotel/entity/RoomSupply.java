@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class RoomSupply {
 
     private Long id;
-    private Supply supply;
+    private Long supplyId;
     private Long roomId;
     private Long personId;
     private LocalDateTime serviceDateTime;
@@ -26,12 +26,12 @@ public class RoomSupply {
         this.id = id;
     }
 
-    public Supply getSupply() {
-        return supply;
+    public Long getSupplyId() {
+        return supplyId;
     }
 
-    public void setSupply(Supply supply) {
-        this.supply = supply;
+    public void setSupplyId(Long supplyId) {
+        this.supplyId = supplyId;
     }
 
     public Long getRoomId() {

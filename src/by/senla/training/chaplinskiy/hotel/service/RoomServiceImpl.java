@@ -208,7 +208,7 @@ public class RoomServiceImpl implements RoomService {
         room.setStatus(OCСUPIED);
         room.setReleaseDate(releaseDate);
         room.setCheckInDate(checkInDate);
-        PersonHistory personHistory = new PersonHistory(person, releaseDate, checkInDate, room.getId());
+        PersonHistory personHistory = new PersonHistory(person.getId(), releaseDate, checkInDate, room.getId());
         personHistoryRepository.addPersonHistory(personHistory);
         room.getPersonHistories().add(personHistory);
 

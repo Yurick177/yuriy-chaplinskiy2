@@ -5,20 +5,20 @@ import java.time.LocalDateTime;
 public class PersonHistory {
 
     private Long id;
-    private final Person person;
+    private final Long personId;
     private final LocalDateTime releaseDate;
     private final LocalDateTime checkInDate;
     private final Long roomId;
 
-    public PersonHistory(Person person, LocalDateTime releaseDate, LocalDateTime checkInDate, Long roomId) {
+    public PersonHistory(Long personId, LocalDateTime releaseDate, LocalDateTime checkInDate, Long roomId) {
         this.roomId = roomId;
-        this.person = person;
+        this.personId = personId;
         this.releaseDate = releaseDate;
         this.checkInDate = checkInDate;
     }
 
-    public Person getPerson() {
-        return person;
+    public Long getPersonId() {
+        return personId;
     }
 
     public LocalDateTime getReleaseDate() {

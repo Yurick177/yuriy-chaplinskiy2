@@ -19,4 +19,5 @@ public interface SupplyRepository {
     void remove(Long id);
 
     Supply getById(Long id);
+
 }
