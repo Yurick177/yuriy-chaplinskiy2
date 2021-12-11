@@ -13,6 +13,10 @@ public class Builder {
 
     private Menu rootMenu = new Menu();
     private Menu menu;
+    private final RoomService roomService = RoomServiceImpl.getRoomService();
+    private final PersonService personService = PersonServiceImpl.getPersonService();
+    private final SupplyService supplyService = SupplyServiceImpl.getSupplyService();
+    private final Scanner scan = new Scanner(System.in);
 
     public Menu getRootMenu() {
         return rootMenu;
@@ -20,11 +24,169 @@ public class Builder {
 
     public void buildMenu() {
 
-        RoomService roomService = RoomServiceImpl.getRoomService();
-        PersonService personService = PersonServiceImpl.getPersonService();
-        SupplyService supplyService = SupplyServiceImpl.getSupplyService();
-        Scanner scan = new Scanner(System.in);
+        MenuItem roomMenuItem = getRoomMenuItem();
+        rootMenu.getMenuItems().add(roomMenuItem);
 
+        MenuItem personMenuItem = getPersonMenuItem();
+        rootMenu.getMenuItems().add(personMenuItem);
+
+        MenuItem supplyMenuItem = getSupplyMenuItem();
+        rootMenu.getMenuItems().add(supplyMenuItem);
+
+        menu = rootMenu;
+    }
+
+    private MenuItem getSupplyMenuItem() {
+        MenuItem supplyMenuItem = new MenuItem();
+        supplyMenuItem.setTitle("3 Supply menu");
+        Menu supplyMenu = new Menu();
+
+        MenuItem getSuppliesSortedByPriceItem = new MenuItem();
+        getSuppliesSortedByPriceItem.setTitle(" 1 Show supplies sorted by price ");
+        IAction getSuppliesSortedByPrice = () -> {
+            List<Supply> supply = supplyService.getSuppliesSortedByPrice();
+            for (Supply i : supply) {
+                System.out.println("цена " + i.getPrice());
+            }
+        };
+        getSuppliesSortedByPriceItem.setAction(getSuppliesSortedByPrice);
+        supplyMenu.getMenuItems().add(getSuppliesSortedByPriceItem);
+
+        MenuItem getSuppliesSortedByTypeItem = new MenuItem();
+        getSuppliesSortedByTypeItem.setTitle(" 2 Show supplies sorted by type ");
+        IAction getSuppliesSortedByType = () -> {
+            List<Supply> supply = supplyService.getSuppliesSortedByType();
+            for (Supply i : supply) {
+                System.out.println("тип " + i.getServiceType());
+            }
+        };
+        getSuppliesSortedByTypeItem.setAction(getSuppliesSortedByType);
+        supplyMenu.getMenuItems().add(getSuppliesSortedByTypeItem);
+
+        MenuItem getAllSupplyItem = new MenuItem();
+        getAllSupplyItem.setTitle(" 3 Show all supply ");
+        IAction getAllSupply = () -> {
+            List<Supply> supplies = supplyService.getAll();
+            for (Supply i : supplies) {
+                System.out.println("id " + i.getId() + " цена " + i.getPrice() + " тип " + i.getServiceType());
+            }
+        };
+        getAllSupplyItem.setAction(getAllSupply);
+        supplyMenu.getMenuItems().add(getAllSupplyItem);
+
+        MenuItem addSupplyItem = new MenuItem();
+        addSupplyItem.setTitle(" 4 Add supply ");
+        IAction addSupply = () -> System.out.println(supplyService.addSupply(scan));
+        addSupplyItem.setAction(addSupply);
+        supplyMenu.getMenuItems().add(addSupplyItem);
+
+        MenuItem updateSupplyItem = new MenuItem();
+        updateSupplyItem.setTitle(" 5 Update supply ");
+        IAction updateSupply = () -> supplyService.update(scan);
+        updateSupplyItem.setAction(updateSupply);
+        supplyMenu.getMenuItems().add(updateSupplyItem);
+
+        MenuItem removeSupplyItem = new MenuItem();
+        removeSupplyItem.setTitle(" 6 Remove supply ");
+        IAction removeSupply = () -> supplyService.remove(scan);
+        removeSupplyItem.setAction(removeSupply);
+        supplyMenu.getMenuItems().add(removeSupplyItem);
+
+        MenuItem getByIdSupplyItem = new MenuItem();
+        getByIdSupplyItem.setTitle(" 7 Show by id supply ");
+        IAction getByIdSupply = () -> {
+            Supply supply = supplyService.getById(scan);
+            if (supply != null) {
+                System.out.println(supply.getId() + " " + supply.getPrice() + " " + supply.getServiceType());
+            } else {
+                System.out.println("услугу по такому id не нашли");
+            }
+        };
+        getByIdSupplyItem.setAction(getByIdSupply);
+        supplyMenu.getMenuItems().add(getByIdSupplyItem);
+
+        MenuItem rollBackSupplyItem = new MenuItem();
+        supplyMenu.getMenuItems().add(rollBackSupplyItem);
+        rollBackSupplyItem.setTitle(" 8 вернуться ");
+        IAction rollBackSupply = () -> rootMenu = menu;
+        rollBackSupplyItem.setAction(rollBackSupply);
+
+        supplyMenu.getMenuItems().add(supplyMenuItem);
+        IAction supplyMenuAction = () -> rootMenu = supplyMenu;
+        supplyMenuItem.setAction(supplyMenuAction);
+        return supplyMenuItem;
+    }
+
+    private MenuItem getPersonMenuItem() {
+        MenuItem personMenuItem = new MenuItem();
+        personMenuItem.setTitle("2 Person menu");
+        Menu personMenu = new Menu();
+
+        MenuItem createPersonItem = new MenuItem();
+        createPersonItem.setTitle(" 1 Create person ");
+        IAction createPerson = () -> {
+            System.out.println("Create person");
+            Long id = personService.createPerson(scan);
+            System.out.println("Person id is " + id);
+        };
+        createPersonItem.setAction(createPerson);
+        personMenu.getMenuItems().add(createPersonItem);
+
+        MenuItem checkInPersonItem = new MenuItem();
+        checkInPersonItem.setTitle(" 2 Check in person ");
+        IAction checkInPerson = () -> {
+            Long roomId = personService.checkInPerson(scan);
+            if (roomId != null) {
+                System.out.println("человек заселен в комнату под номером " + roomId);
+            } else {
+                System.out.println("свободных комнат нет");
+            }
+        };
+        checkInPersonItem.setAction(checkInPerson);
+        personMenu.getMenuItems().add(checkInPersonItem);
+
+        MenuItem checkOutPersonItem = new MenuItem();
+        checkOutPersonItem.setTitle(" 3 Check out person ");
+        IAction checkOutPerson = () -> personService.checkOutPerson(scan);
+        checkOutPersonItem.setAction(checkOutPerson);
+        personMenu.getMenuItems().add(checkOutPersonItem);
+
+        MenuItem sortAbsItem = new MenuItem();
+        sortAbsItem.setTitle(" 4 Sort person by abs ");
+        IAction sortAbc = () -> {
+            List<Person> persons = personService.sortAbs();
+            for (Person i : persons) {
+                System.out.println(i.getId() + " " + i.getName() + " " + i.getLastName() + " " + i.getAge());
+            }
+        };
+        sortAbsItem.setAction(sortAbc);
+        personMenu.getMenuItems().add(sortAbsItem);
+
+        MenuItem getNumberGuestsItem = new MenuItem();
+        getNumberGuestsItem.setTitle(" 5 Show list guests ");
+        IAction getNumberGuest = () -> System.out.println(personService.getNumberGuests());
+        getNumberGuestsItem.setAction(getNumberGuest);
+        personMenu.getMenuItems().add(getNumberGuestsItem);
+
+        MenuItem getTotalPriceItem = new MenuItem();
+        getTotalPriceItem.setTitle(" 6 Show total price ");
+        IAction getTotalPrice = () -> System.out.println(personService.getTotalPrice(scan));
+        getTotalPriceItem.setAction(getTotalPrice);
+        personMenu.getMenuItems().add(getTotalPriceItem);
+
+        MenuItem rollBackPersonItem = new MenuItem();
+        personMenu.getMenuItems().add(rollBackPersonItem);
+        rollBackPersonItem.setTitle(" 7 вернуться ");
+        IAction rollBackPerson = () -> rootMenu = menu;
+        rollBackPersonItem.setAction(rollBackPerson);
+
+        personMenu.getMenuItems().add(personMenuItem);
+        IAction personMenuAction = () -> rootMenu = personMenu;
+        personMenuItem.setAction(personMenuAction);
+        return personMenuItem;
+    }
+
+    private MenuItem getRoomMenuItem() {
         MenuItem roomMenuItem = new MenuItem();
         roomMenuItem.setTitle("1 Room menu");
         Menu roomMenu = new Menu();
@@ -236,155 +398,7 @@ public class Builder {
         roomMenuItem.setNextMenu(roomMenu);
         IAction roomMenuAction = () -> rootMenu = roomMenu;
         roomMenuItem.setAction(roomMenuAction);
-        rootMenu.getMenuItems().add(roomMenuItem);
-
-        MenuItem personMenuItem = new MenuItem();
-        personMenuItem.setTitle("2 Person menu");
-        Menu personMenu = new Menu();
-
-        MenuItem createPersonItem = new MenuItem();
-        createPersonItem.setTitle(" 1 Create person ");
-        IAction createPerson = () -> {
-            System.out.println("Create person");
-            Long id = personService.createPerson(scan);
-            System.out.println("Person id is " + id);
-        };
-        createPersonItem.setAction(createPerson);
-        personMenu.getMenuItems().add(createPersonItem);
-
-        MenuItem checkInPersonItem = new MenuItem();
-        checkInPersonItem.setTitle(" 2 Check in person ");
-        IAction checkInPerson = () -> {
-            Long roomId = personService.checkInPerson(scan);
-            if (roomId != null) {
-                System.out.println("человек заселен в комнату под номером " + roomId);
-            } else {
-                System.out.println("свободных комнат нет");
-            }
-        };
-        checkInPersonItem.setAction(checkInPerson);
-        personMenu.getMenuItems().add(checkInPersonItem);
-
-        MenuItem checkOutPersonItem = new MenuItem();
-        checkOutPersonItem.setTitle(" 3 Check out person ");
-        IAction checkOutPerson = () -> personService.checkOutPerson(scan);
-        checkOutPersonItem.setAction(checkOutPerson);
-        personMenu.getMenuItems().add(checkOutPersonItem);
-
-        MenuItem sortAbsItem = new MenuItem();
-        sortAbsItem.setTitle(" 4 Sort person by abs ");
-        IAction sortAbc = () -> {
-            List<Person> persons = personService.sortAbs();
-            for (Person i : persons) {
-                System.out.println(i.getId() + " " + i.getName() + " " + i.getLastName() + " " + i.getAge());
-            }
-        };
-        sortAbsItem.setAction(sortAbc);
-        personMenu.getMenuItems().add(sortAbsItem);
-
-        MenuItem getNumberGuestsItem = new MenuItem();
-        getNumberGuestsItem.setTitle(" 5 Show list guests ");
-        IAction getNumberGuest = () -> System.out.println(personService.getNumberGuests());
-        getNumberGuestsItem.setAction(getNumberGuest);
-        personMenu.getMenuItems().add(getNumberGuestsItem);
-
-        MenuItem getTotalPriceItem = new MenuItem();
-        getTotalPriceItem.setTitle(" 6 Show total price ");
-        IAction getTotalPrice = () -> System.out.println(personService.getTotalPrice(scan));
-        getTotalPriceItem.setAction(getTotalPrice);
-        personMenu.getMenuItems().add(getTotalPriceItem);
-
-        MenuItem rollBackPersonItem = new MenuItem();
-        personMenu.getMenuItems().add(rollBackPersonItem);
-        rollBackPersonItem.setTitle(" 7 вернуться ");
-        IAction rollBackPerson = () -> rootMenu = menu;
-        rollBackPersonItem.setAction(rollBackPerson);
-
-        personMenu.getMenuItems().add(personMenuItem);
-        IAction personMenuAction = () -> rootMenu = personMenu;
-        personMenuItem.setAction(personMenuAction);
-        rootMenu.getMenuItems().add(personMenuItem);
-
-        MenuItem supplyMenuItem = new MenuItem();
-        supplyMenuItem.setTitle("3 Supply menu");
-        Menu supplyMenu = new Menu();
-
-        MenuItem getSuppliesSortedByPriceItem = new MenuItem();
-        getSuppliesSortedByPriceItem.setTitle(" 1 Show supplies sorted by price ");
-        IAction getSuppliesSortedByPrice = () -> {
-            List<Supply> supply = supplyService.getSuppliesSortedByPrice();
-            for (Supply i : supply) {
-                System.out.println("цена " + i.getPrice());
-            }
-        };
-        getSuppliesSortedByPriceItem.setAction(getSuppliesSortedByPrice);
-        supplyMenu.getMenuItems().add(getSuppliesSortedByPriceItem);
-
-        MenuItem getSuppliesSortedByTypeItem = new MenuItem();
-        getSuppliesSortedByTypeItem.setTitle(" 2 Show supplies sorted by type ");
-        IAction getSuppliesSortedByType = () -> {
-            List<Supply> supply = supplyService.getSuppliesSortedByType();
-            for (Supply i : supply) {
-                System.out.println("тип " + i.getServiceType());
-            }
-        };
-        getSuppliesSortedByTypeItem.setAction(getSuppliesSortedByType);
-        supplyMenu.getMenuItems().add(getSuppliesSortedByTypeItem);
-
-        MenuItem getAllSupplyItem = new MenuItem();
-        getAllSupplyItem.setTitle(" 3 Show all supply ");
-        IAction getAllSupply = () -> {
-            List<Supply> supplies = supplyService.getAll();
-            for (Supply i : supplies) {
-                System.out.println("id " + i.getId() + " цена " + i.getPrice() + " тип " + i.getServiceType());
-            }
-        };
-        getAllSupplyItem.setAction(getAllSupply);
-        supplyMenu.getMenuItems().add(getAllSupplyItem);
-
-        MenuItem addSupplyItem = new MenuItem();
-        addSupplyItem.setTitle(" 4 Add supply ");
-        IAction addSupply = () -> System.out.println(supplyService.addSupply(scan));
-        addSupplyItem.setAction(addSupply);
-        supplyMenu.getMenuItems().add(addSupplyItem);
-
-        MenuItem updateSupplyItem = new MenuItem();
-        updateSupplyItem.setTitle(" 5 Update supply ");
-        IAction updateSupply = () -> supplyService.update(scan);
-        updateSupplyItem.setAction(updateSupply);
-        supplyMenu.getMenuItems().add(updateSupplyItem);
-
-        MenuItem removeSupplyItem = new MenuItem();
-        removeSupplyItem.setTitle(" 6 Remove supply ");
-        IAction removeSupply = () -> supplyService.remove(scan);
-        removeSupplyItem.setAction(removeSupply);
-        supplyMenu.getMenuItems().add(removeSupplyItem);
-
-        MenuItem getByIdSupplyItem = new MenuItem();
-        getByIdSupplyItem.setTitle(" 7 Show by id supply ");
-        IAction getByIdSupply = () -> {
-            Supply supply = supplyService.getById(scan);
-            if (supply != null) {
-                System.out.println(supply.getId() + " " + supply.getPrice() + " " + supply.getServiceType());
-            } else {
-                System.out.println("услугу по такому id не нашли");
-            }
-        };
-        getByIdSupplyItem.setAction(getByIdSupply);
-        supplyMenu.getMenuItems().add(getByIdSupplyItem);
-
-        MenuItem rollBackSupplyItem = new MenuItem();
-        supplyMenu.getMenuItems().add(rollBackSupplyItem);
-        rollBackSupplyItem.setTitle(" 8 вернуться ");
-        IAction rollBackSupply = () -> rootMenu = menu;
-        rollBackSupplyItem.setAction(rollBackSupply);
-
-        supplyMenu.getMenuItems().add(supplyMenuItem);
-        IAction supplyMenuAction = () -> rootMenu = supplyMenu;
-        supplyMenuItem.setAction(supplyMenuAction);
-        rootMenu.getMenuItems().add(supplyMenuItem);
-
-        menu = rootMenu;
+        return roomMenuItem;
     }
 
 }
