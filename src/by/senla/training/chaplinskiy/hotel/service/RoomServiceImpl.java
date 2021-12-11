@@ -15,9 +15,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
-import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
+import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 
 public class RoomServiceImpl implements RoomService {
 

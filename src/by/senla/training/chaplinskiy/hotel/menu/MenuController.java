@@ -16,9 +16,24 @@ public class MenuController {
             navigator = new Navigator();
             navigator.setCurrentMenu(builder.getRootMenu());
             navigator.printMenu();
-            System.out.println("Ведите нужную цифру");
-            String b = scan.nextLine();
-            navigator.navigate(Integer.valueOf(b));
+            navigate(scan);
+
         }
     }
+
+    private void navigate(Scanner scan) {
+        System.out.println("Ведите нужную цифру");
+        String b = scan.nextLine();
+        try {
+            int index = Integer.parseInt(b);
+            navigator.navigate(index);
+        } catch (NumberFormatException numberFormatException) {
+            System.out.println("Вы ввели не тот символ");
+            navigate(scan);
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            System.out.println("вы ввели цифру, которой не существует");
+            navigate(scan);
+        }
+    }
+
 }

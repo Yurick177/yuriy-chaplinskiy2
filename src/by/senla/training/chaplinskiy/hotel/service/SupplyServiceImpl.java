@@ -7,6 +7,7 @@ import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepository;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepositoryImpl;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
@@ -52,7 +53,7 @@ public class SupplyServiceImpl implements SupplyService {
     }
 
     public Long addSupply(Scanner scanner) {
-        System.out.println(" введите тип услуги ");
+        System.out.println(" введите тип услуги " + Arrays.toString(SupplyType.values()));
         String supplyType = scanner.nextLine();
         SupplyType supplyType1 = SupplyType.valueOf(supplyType);
         System.out.println(" введите цену ");
