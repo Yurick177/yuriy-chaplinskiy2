@@ -13,7 +13,6 @@ import java.util.Scanner;
 public class Builder {
 
     private Menu rootMenu = new Menu();
-    private Menu menu;
     private final RoomService roomService = RoomServiceImpl.getRoomService();
     private final PersonService personService = PersonServiceImpl.getPersonService();
     private final SupplyService supplyService = SupplyServiceImpl.getSupplyService();
@@ -27,15 +26,17 @@ public class Builder {
     public void buildMenu() {
 
         MenuItem roomMenuItem = getRoomMenuItem();
+        roomMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(roomMenuItem);
 
         MenuItem personMenuItem = getPersonMenuItem();
+        personMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(personMenuItem);
 
         MenuItem supplyMenuItem = getSupplyMenuItem();
+        supplyMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(supplyMenuItem);
 
-        menu = rootMenu;
     }
 
     private MenuItem getSupplyMenuItem() {
@@ -110,7 +111,7 @@ public class Builder {
         MenuItem rollBackSupplyItem = new MenuItem();
         supplyMenu.getMenuItems().add(rollBackSupplyItem);
         rollBackSupplyItem.setTitle(" 8 вернуться ");
-        IAction rollBackSupply = () -> rootMenu = menu;
+        IAction rollBackSupply = () -> rootMenu = supplyMenuItem.getNextMenu();
         rollBackSupplyItem.setAction(rollBackSupply);
 
         supplyMenu.getMenuItems().add(supplyMenuItem);
@@ -121,6 +122,7 @@ public class Builder {
 
     private MenuItem getPersonMenuItem() {
         MenuItem personMenuItem = new MenuItem();
+        personMenuItem.setNextMenu(rootMenu);
         personMenuItem.setTitle("2 Person menu");
         Menu personMenu = new Menu();
 
@@ -179,7 +181,7 @@ public class Builder {
         MenuItem rollBackPersonItem = new MenuItem();
         personMenu.getMenuItems().add(rollBackPersonItem);
         rollBackPersonItem.setTitle(" 7 вернуться ");
-        IAction rollBackPerson = () -> rootMenu = menu;
+        IAction rollBackPerson = () -> rootMenu = personMenuItem.getNextMenu();
         rollBackPersonItem.setAction(rollBackPerson);
 
         personMenu.getMenuItems().add(personMenuItem);
@@ -190,6 +192,7 @@ public class Builder {
 
     private MenuItem getRoomMenuItem() {
         MenuItem roomMenuItem = new MenuItem();
+        roomMenuItem.setNextMenu(rootMenu);
         roomMenuItem.setTitle("1 Room menu");
         Menu roomMenu = new Menu();
 
@@ -394,7 +397,7 @@ public class Builder {
         MenuItem rollBackItem = new MenuItem();
         roomMenu.getMenuItems().add(rollBackItem);
         rollBackItem.setTitle(" 20 вернуться ");
-        IAction rollBack = () -> rootMenu = menu;
+        IAction rollBack = () -> rootMenu = roomMenuItem.getNextMenu();
         rollBackItem.setAction(rollBack);
 
         roomMenuItem.setNextMenu(roomMenu);
