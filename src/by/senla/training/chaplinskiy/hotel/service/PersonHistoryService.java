@@ -8,4 +8,5 @@ import java.util.Scanner;
 public interface PersonHistoryService {
 
     List<PersonHistoryDto> getPersonHistoriesByRoomId(Scanner scanner);
+
 }
