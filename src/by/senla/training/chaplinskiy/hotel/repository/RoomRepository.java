@@ -10,4 +10,6 @@ public interface RoomRepository {
 
     void setRooms(List<Room> rooms);
 
+    Room getRoomById(Long id);
+
 }

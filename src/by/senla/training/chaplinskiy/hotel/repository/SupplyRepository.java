@@ -10,4 +10,14 @@ public interface SupplyRepository {
 
     void setSupplies(List<Supply> supplies);
 
+    List<Supply> getAll();
+
+    Long addSupply(Supply supply);
+
+    void update(Supply supply);
+
+    void remove(Long id);
+
+    Supply getById(Long id);
+
 }

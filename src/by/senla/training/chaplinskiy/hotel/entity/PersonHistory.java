@@ -1,23 +1,24 @@
 package by.senla.training.chaplinskiy.hotel.entity;
 
-import by.senla.training.chaplinskiy.hotel.entity.Person;
-
 import java.time.LocalDateTime;
 
 public class PersonHistory {
 
-    private Person person;
-    private LocalDateTime releaseDate;
-    private LocalDateTime checkInDate;
+    private Long id;
+    private final Long personId;
+    private final LocalDateTime releaseDate;
+    private final LocalDateTime checkInDate;
+    private final Long roomId;
 
-    public PersonHistory(Person person, LocalDateTime releaseDate, LocalDateTime checkInDate) {
-        this.person = person;
+    public PersonHistory(Long personId, LocalDateTime releaseDate, LocalDateTime checkInDate, Long roomId) {
+        this.roomId = roomId;
+        this.personId = personId;
         this.releaseDate = releaseDate;
         this.checkInDate = checkInDate;
     }
 
-    public Person getPerson() {
-        return person;
+    public Long getPersonId() {
+        return personId;
     }
 
     public LocalDateTime getReleaseDate() {
@@ -28,4 +29,15 @@ public class PersonHistory {
         return checkInDate;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getRoomId() {
+        return roomId;
+    }
 }

@@ -1,17 +1,18 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
 import by.senla.training.chaplinskiy.hotel.entity.Person;
+import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
-import by.senla.training.chaplinskiy.hotel.entity.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Scanner;
 
 public interface RoomService {
 
     void addPerson(Room room, Person person, LocalDateTime checkInDate, LocalDateTime releaseDate);
 
-    Room createRoom(Status status, int price, long id, int star, int capacityRoom);
+    Room createRoom(Scanner scanner);
 
     List<Room> getRooms();
 
@@ -49,6 +50,10 @@ public interface RoomService {
 
     int getFreeNumbers();
 
-    List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime);
+    List<Room> getAvailableRoomsByDate(Scanner scanner);
+
+    void removePerson(Room room);
+
+    List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner);
 
 }

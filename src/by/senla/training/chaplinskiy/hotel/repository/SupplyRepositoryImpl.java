@@ -4,11 +4,16 @@ import by.senla.training.chaplinskiy.hotel.entity.Supply;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SupplyRepositoryImpl implements SupplyRepository {
 
     private List<Supply> supplies;
     private static SupplyRepositoryImpl supplyRepository = null;
+
+    private SupplyRepositoryImpl() {
+        this.supplies = new ArrayList<>();
+    }
 
     public List<Supply> getSupplies() {
         if (supplies == null) {
@@ -26,6 +31,33 @@ public class SupplyRepositoryImpl implements SupplyRepository {
             supplyRepository = new SupplyRepositoryImpl();
         }
         return supplyRepository;
+    }
+
+    public List<Supply> getAll() {
+        return supplies;
+    }
+
+    public Long addSupply(Supply supply) {
+        long id = supplies.stream().mapToLong(Supply::getId).max().orElse(0);
+        supply.setId(id + 1);
+        supplies.add(supply);
+        return supply.getId();
+    }
+
+    public void update(Supply supply) {
+        Supply currentSupply = supplies.stream().filter(a -> a.getId().equals(supply.getId())).findFirst().orElse(null);
+        if (currentSupply != null) {
+            currentSupply.setPrice(supply.getPrice());
+        }
+    }
+
+    public void remove(Long id) {
+        List<Supply> newSupply = supplies.stream().filter(a -> !a.getId().equals(id)).collect(Collectors.toList());
+        setSupplies(newSupply);
+    }
+
+    public Supply getById(Long id) {
+        return supplies.stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
     }
 
 }

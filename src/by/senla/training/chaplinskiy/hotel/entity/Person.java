@@ -2,9 +2,10 @@ package by.senla.training.chaplinskiy.hotel.entity;
 
 public class Person {
 
-    private String name;
-    private String lastName;
-    private int age;
+    private Long id;
+    private final String name;
+    private final String lastName;
+    private final int age;
 
     public Person(String name, String lastName, int age) {
         this.name = name;
@@ -12,28 +13,24 @@ public class Person {
         this.age = age;
     }
 
-    public String getName() {
-        return name;
+    public Long getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     public int getAge() {
         return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
 }

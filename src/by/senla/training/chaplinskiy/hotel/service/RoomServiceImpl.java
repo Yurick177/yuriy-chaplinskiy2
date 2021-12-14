@@ -13,14 +13,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
+import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
+import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 
 public class RoomServiceImpl implements RoomService {
 
     private static RoomService roomService = null;
-    private PersonHistoryRepository personHistoryRepository;
-    private RoomRepository roomRepository;
+    private final PersonHistoryRepository personHistoryRepository;
+    private final RoomRepository roomRepository;
 
     private RoomServiceImpl() {
         this.roomRepository = RoomRepositoryImpl.getRoomRepository();
@@ -34,8 +37,23 @@ public class RoomServiceImpl implements RoomService {
         return roomService;
     }
 
-    public Room createRoom(Status status, int price, long id, int star, int capacityRoom) {
-        Room room = new Room(status, price, id, star, capacityRoom);
+    public Room createRoom(Scanner scanner) {
+        System.out.println("Введите статус комнаты");
+        for (Status status : Status.values()) {
+            System.out.println(status.name());
+        }
+        String statusString = scanner.nextLine();
+        Status status = Status.valueOf(statusString);
+        System.out.println("введите цену");
+        String price = scanner.nextLine();
+        System.out.println("введите номер комнаты");
+        String id = scanner.nextLine();
+        System.out.println("введите звезду");
+        String star = scanner.nextLine();
+        System.out.println("введите вместимость");
+        String capacityRoom = scanner.nextLine();
+
+        Room room = new Room(status, Integer.parseInt(price), Integer.parseInt(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
         roomRepository.getRooms().add(room);
         return room;
     }
@@ -46,60 +64,35 @@ public class RoomServiceImpl implements RoomService {
 
     public List<Room> getRoomsByPriceAsc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getPrice() > o2.getPrice() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByPriceDesc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getPrice() < o2.getPrice() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() < o2.getPrice() ? 1 : -1;
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByStarAsc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getStar() > o2.getStar() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getStar() > o2.getStar() ? 1 : -1;
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByStarDesc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getStar() < o2.getStar() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getStar() < o2.getStar() ? 1 : -1;
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByCapacityRoomAsc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getCapacityRoom() > o2.getCapacityRoom() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() > o2.getCapacityRoom() ? 1 : -1;
         rooms.sort(comparator);
         return rooms;
 
@@ -107,12 +100,7 @@ public class RoomServiceImpl implements RoomService {
 
     public List<Room> getRoomsByCapacityRoomDesc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getCapacityRoom() < o2.getCapacityRoom() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() < o2.getCapacityRoom() ? 1 : -1;
         rooms.sort(comparator);
         return rooms;
     }
@@ -130,72 +118,42 @@ public class RoomServiceImpl implements RoomService {
 
     public List<Room> getAvailableRoomsByPriceAsc() {
 
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getPrice() > o2.getPrice() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByPriceDesc() {
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getPrice() < o2.getPrice() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() < o2.getPrice() ? 1 : -1;
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByCapacityAsc() {
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getCapacityRoom() > o2.getCapacityRoom() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() > o2.getCapacityRoom() ? 1 : -1;
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByCapacityDesc() {
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getCapacityRoom() < o2.getCapacityRoom() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() < o2.getCapacityRoom() ? 1 : -1;
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByStarAsc() {
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getStar() > o2.getStar() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getStar() > o2.getStar() ? 1 : -1;
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByStarDesc() {
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getStar() < o2.getStar() ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getStar() < o2.getStar() ? 1 : -1;
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
@@ -213,24 +171,14 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public List<Room> getOccupiedRoomsSortByDateDesc() {
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getReleaseDate().isBefore(o2.getReleaseDate()) ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = Comparator.comparing(Room::getReleaseDate);
         List<Room> occupiedRooms = getOccupiedRooms();
         occupiedRooms.sort(comparator);
         return occupiedRooms;
     }
 
     public List<Room> getOccupiedRoomsSortByDateAsc() {
-        Comparator<Room> comparator = new Comparator<Room>() {
-            @Override
-            public int compare(Room o1, Room o2) {
-                return o1.getReleaseDate().isAfter(o2.getReleaseDate()) ? 1 : -1;
-            }
-        };
+        Comparator<Room> comparator = (o1, o2) -> o1.getReleaseDate().compareTo(o2.getReleaseDate()) * -1;
         List<Room> occupiedRooms = getOccupiedRooms();
         occupiedRooms.sort(comparator);
         return occupiedRooms;
@@ -241,7 +189,10 @@ public class RoomServiceImpl implements RoomService {
         return freeNumbers.size();
     }
 
-    public List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime) {
+    public List<Room> getAvailableRoomsByDate(Scanner scanner) {
+        System.out.println("введите год.месяц.день.часы.минуты заселения");
+        String date = scanner.nextLine();
+        LocalDateTime localDateTime = getLocalDateTimeFromString(date);
         List<Room> rooms = roomRepository.getRooms();
         List<Room> result = new ArrayList<>();
         for (Room i : rooms) {
@@ -257,10 +208,22 @@ public class RoomServiceImpl implements RoomService {
         room.setStatus(OCСUPIED);
         room.setReleaseDate(releaseDate);
         room.setCheckInDate(checkInDate);
-        PersonHistory personHistory = new PersonHistory(person, releaseDate, checkInDate);
+        PersonHistory personHistory = new PersonHistory(person.getId(), releaseDate, checkInDate, room.getId());
         personHistoryRepository.addPersonHistory(personHistory);
         room.getPersonHistories().add(personHistory);
 
+    }
+
+    @Override
+    public void removePerson(Room room) {
+        room.setPerson(null);
+        room.setStatus(AVAILABLE);
+    }
+
+    public List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner) {
+        System.out.println("введите id комнаты, по которой выведется история клиентов");
+        long roomId = Long.parseLong(scanner.nextLine());
+        return personHistoryRepository.getPersonHistoriesByRoomId(roomId);
     }
 
 }
