@@ -12,6 +12,17 @@ import java.util.Scanner;
 
 public class Builder {
 
+    private static Builder builder ;
+
+    private Builder(){
+    }
+
+    public static Builder getBuilder(){
+        if(builder == null){
+            builder = new Builder();
+        }return  builder;
+    }
+
     private Menu rootMenu = new Menu();
     private final RoomService roomService = RoomServiceImpl.getRoomService();
     private final PersonService personService = PersonServiceImpl.getPersonService();
@@ -37,6 +48,11 @@ public class Builder {
         supplyMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(supplyMenuItem);
 
+        MenuItem exitMenuItem = new MenuItem();
+        exitMenuItem.setTitle("4 Exit ");
+        IAction exitMenu = ()-> rootMenu = null;
+        exitMenuItem.setAction(exitMenu);
+        rootMenu.getMenuItems().add(exitMenuItem);
     }
 
     private MenuItem getSupplyMenuItem() {
