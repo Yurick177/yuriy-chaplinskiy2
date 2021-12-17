@@ -3,6 +3,7 @@ package by.senla.training.chaplinskiy.hotel.service;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
+import by.senla.training.chaplinskiy.hotel.exception.LocalDateTimeFromStringException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
@@ -15,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
+import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getDate;
 import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 
 public class PersonServiceImpl implements PersonService {
@@ -96,18 +98,16 @@ public class PersonServiceImpl implements PersonService {
                 System.out.println("введите id пользователя ");
                 Long id = Long.parseLong(scanner.nextLine());
                 Person person = personRepository.getPersonById(id);
-                System.out.println("введите год.месяц.день.часы.минуты заселения");
-                String date = scanner.nextLine();
-                LocalDateTime checkInDate = getLocalDateTimeFromString(date);
-                System.out.println("введите год.месяц.день.часы.минуты выселения");
-                String date2 = scanner.nextLine();
-                LocalDateTime releaseDate = getLocalDateTimeFromString(date2);
+                LocalDateTime checkInDate = getDate(scanner, "введите год.месяц.день.часы.минуты заселения");
+                LocalDateTime releaseDate = getDate(scanner, "введите год.месяц.день.часы.минуты выселения");
                 roomService.addPerson(room, person, checkInDate, releaseDate);
                 return room.getId();
             }
         }
         return null;
     }
+
+
 
     public void checkOutPerson(Scanner scanner) {
         System.out.println("введите id клиента ");

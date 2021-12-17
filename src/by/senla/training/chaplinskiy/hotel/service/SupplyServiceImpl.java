@@ -6,6 +6,7 @@ import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepository;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -55,9 +56,21 @@ public class SupplyServiceImpl implements SupplyService {
     public Long addSupply(Scanner scanner) {
         System.out.println(" введите тип услуги " + Arrays.toString(SupplyType.values()));
         String supplyType = scanner.nextLine();
-        SupplyType supplyType1 = SupplyType.valueOf(supplyType);
+        SupplyType supplyType1 = null;
+        try {
+            supplyType1 = SupplyType.valueOf(supplyType);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка!!! вводите тип, как указанно");
+            addSupply(scanner);
+        }
         System.out.println(" введите цену ");
-        int price = Integer.parseInt(scanner.nextLine());
+        int price = 0;
+        try {
+            price = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Ошибка!!! вы ввели цену не правильно, вводите только цифры");
+            addSupply(scanner);
+        }
         Supply supply = new Supply(supplyType1, price);
         Long id = supplyRepository.addSupply(supply);
         return id;
@@ -65,9 +78,15 @@ public class SupplyServiceImpl implements SupplyService {
 
     public void update(Scanner scanner) {
         System.out.println(" введите id услуги ");
-        Long id = Long.parseLong(scanner.nextLine());
+        Long id = ScannerUtils.getLongFromConsole(scanner);
         System.out.println(" введите новую цену ");
-        int price = Integer.parseInt(scanner.nextLine());
+        int price = 0;
+        try {
+            price = Integer.parseInt(scanner.nextLine());
+        } catch ( NumberFormatException r) {
+            System.out.println("Ошибка!!! вводите только цифры");
+            update(scanner);
+        }
         Supply supply = new Supply(null, price);
         supply.setId(id);
         supplyRepository.update(supply);
@@ -75,13 +94,13 @@ public class SupplyServiceImpl implements SupplyService {
 
     public void remove(Scanner scanner) {
         System.out.println(" введите id услуги, которую нужно удалить");
-        Long id = Long.parseLong(scanner.nextLine());
+        Long id = ScannerUtils.getLongFromConsole(scanner);
         supplyRepository.remove(id);
     }
 
     public Supply getById(Scanner scanner) {
         System.out.println(" введите id услуги ");
-        Long id = Long.parseLong(scanner.nextLine());
+        Long id = ScannerUtils.getLongFromConsole(scanner);
         return supplyRepository.getById(id);
     }
 

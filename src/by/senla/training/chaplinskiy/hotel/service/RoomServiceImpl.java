@@ -4,6 +4,7 @@ import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
+import by.senla.training.chaplinskiy.hotel.exception.LocalDateTimeFromStringException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
@@ -17,6 +18,7 @@ import java.util.Scanner;
 
 import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
+import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getDate;
 import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 
 public class RoomServiceImpl implements RoomService {
@@ -190,9 +192,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public List<Room> getAvailableRoomsByDate(Scanner scanner) {
-        System.out.println("введите год.месяц.день.часы.минуты заселения");
-        String date = scanner.nextLine();
-        LocalDateTime localDateTime = getLocalDateTimeFromString(date);
+        LocalDateTime localDateTime = getDate(scanner, "введите год.месяц.день.часы.минуты заселения");
         List<Room> rooms = roomRepository.getRooms();
         List<Room> result = new ArrayList<>();
         for (Room i : rooms) {
