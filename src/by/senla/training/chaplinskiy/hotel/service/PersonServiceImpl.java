@@ -3,18 +3,19 @@ package by.senla.training.chaplinskiy.hotel.service;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
+import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
+import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
 import by.senla.training.chaplinskiy.hotel.exception.LocalDateTimeFromStringException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
 
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getDate;
 import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
@@ -25,11 +26,15 @@ public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
     private final RoomRepository roomRepository;
     private final RoomService roomService;
+    private final CsvReader csvReader;
+    private final CsvWriter csvWriter;
 
     public PersonServiceImpl() {
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
         this.roomRepository = RoomRepositoryImpl.getRoomRepository();
         this.roomService = RoomServiceImpl.getRoomService();
+        this.csvReader = CsvReader.getCsvReader();
+        this.csvWriter = CsvWriter.getCsvWriter();
     }
 
     public static PersonService getPersonService() {
@@ -108,7 +113,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
 
-
     public void checkOutPerson(Scanner scanner) {
         System.out.println("введите id клиента ");
         Long personId = Long.parseLong(scanner.nextLine());
@@ -131,6 +135,47 @@ public class PersonServiceImpl implements PersonService {
         } else {
             System.out.println("клиент по id не найден ");
         }
+    }
+
+    @Override
+    public void importFromFile() {
+        try {
+            List<String> linesFromFile = csvReader.getLinesFromFile("C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Person.csv");
+            List<Person> personList = getPersonsFromStrings(linesFromFile);
+            personRepository.addAllPerson(personList);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Не правильный путь к файлу");
+        }
+    }
+
+    private List<Person> getPersonsFromStrings(List<String> lines) {
+        List<Person> personList = new ArrayList<>();
+        for (int i = 1; i < lines.size(); i++) {
+            Person person = getPersonFromString(lines.get(i));
+            personList.add(person);
+        }
+        return personList;
+    }
+
+    private Person getPersonFromString(String line) {
+        String[] split = line.split("\\,");
+        Long id = Objects.equals(split[0], "") ? null : Long.parseLong(split[0]);
+        String name = split[1];
+        String lastName = split[2];
+        int age = Integer.parseInt(split[3]);
+        Person person = new Person(name, lastName, age);
+        person.setId(id);
+        return person;
+    }
+
+    public void exportFile(){
+        List<Person> personList = personRepository.getPersons();
+        List<String> lines = new ArrayList<>();
+        for (Person person: personList){
+            String line = person.getId() + "," + person.getName() + "," + person.getLastName() + "," + person.getAge();
+            lines.add(line);
+        }
+       csvWriter.writeLinesToFile(lines,"C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Person_Result.csv");
     }
 
 }

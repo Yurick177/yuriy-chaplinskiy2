@@ -40,4 +40,27 @@ public class PersonRepositoryImpl implements PersonRepository {
         return persons.stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
     }
 
+    @Override
+    public List<Person> addAllPerson(List<Person> persons) {
+        for (Person person : persons) {
+            if (person.getId() == null) {
+                addPerson(person);
+            } else {
+                update(person);
+            }
+        }
+        return persons;
+    }
+
+    public void update(Person person) {
+        Person current = getPersonById(person.getId());
+        if (current == null) {
+            System.out.println("Такого человека по Id " + person.getId() + " не найден");
+        } else {
+            current.setName(person.getName());
+            current.setLastName(person.getLastName());
+            current.setAge(person.getAge());
+        }
+    }
+
 }

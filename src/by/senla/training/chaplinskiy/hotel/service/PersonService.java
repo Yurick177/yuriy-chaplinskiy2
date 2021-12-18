@@ -22,4 +22,7 @@ public interface PersonService {
 
     void checkOutPerson(Scanner scanner);
 
+    void importFromFile();
+
+    void exportFile();
 }

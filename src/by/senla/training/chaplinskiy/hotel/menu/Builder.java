@@ -194,9 +194,21 @@ public class Builder {
         getTotalPriceItem.setAction(getTotalPrice);
         personMenu.getMenuItems().add(getTotalPriceItem);
 
+        MenuItem importPersonFromFileItem = new MenuItem();
+        importPersonFromFileItem.setTitle(" 7 ImportPersonFromFile");
+        IAction importPersonFromFile = personService::importFromFile;
+        importPersonFromFileItem.setAction(importPersonFromFile);
+        personMenu.getMenuItems().add(importPersonFromFileItem);
+
+        MenuItem exportFileItem = new MenuItem();
+        exportFileItem.setTitle(" 8 ExportFile");
+        IAction exportFile = personService::exportFile;
+        exportFileItem.setAction(exportFile);
+        personMenu.getMenuItems().add(exportFileItem);
+
         MenuItem rollBackPersonItem = new MenuItem();
         personMenu.getMenuItems().add(rollBackPersonItem);
-        rollBackPersonItem.setTitle(" 7 вернуться ");
+        rollBackPersonItem.setTitle(" 9 вернуться ");
         IAction rollBackPerson = () -> rootMenu = personMenuItem.getNextMenu();
         rollBackPersonItem.setAction(rollBackPerson);
 

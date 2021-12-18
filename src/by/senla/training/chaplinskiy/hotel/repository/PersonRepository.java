@@ -14,4 +14,6 @@ public interface PersonRepository {
 
     Person getPersonById(Long id);
 
+    List<Person> addAllPerson(List<Person> persons);
+
 }
