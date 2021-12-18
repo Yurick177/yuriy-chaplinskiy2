@@ -163,6 +163,7 @@ public class PersonServiceImpl implements PersonService {
     public void exportFile() {
         List<Person> personList = personRepository.getPersons();
         List<String> lines = new ArrayList<>();
+        lines.add("id,name,LastName,age");
         for (Person person : personList) {
             String line = person.getId() + "," + person.getName() + "," + person.getLastName() + "," + person.getAge();
             lines.add(line);

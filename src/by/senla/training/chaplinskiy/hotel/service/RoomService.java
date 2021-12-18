@@ -54,4 +54,7 @@ public interface RoomService {
 
     void removePerson(Room room);
 
+    void exportFile();
+
+    void importFromFile();
 }

@@ -10,4 +10,10 @@ public interface RoomRepository {
 
     Room getRoomById(Long id);
 
+    Long addRoom(Room room);
+
+    void update(Room room);
+
+    List<Room> addAll(List<Room> rooms);
+
 }

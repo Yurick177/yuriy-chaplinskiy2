@@ -6,18 +6,18 @@ import java.util.List;
 
 public class Room {
 
-    private final Long id;
+    private  Long id;
     private List<PersonHistory> personHistories;
     private LocalDateTime releaseDate;
     private LocalDateTime checkInDate;
     private int capacityRoom;
-    private int star;
+    private Integer star;
     private Status status;
     private int price;
     private Person person;
     private List<Supply> services;
 
-    public Room(Status status, int price, long id, int star, int capacityRoom) {
+    public Room(Status status, int price, Long id, int star, int capacityRoom) {
         this.status = status;
         this.id = id;
         this.price = price;
@@ -25,6 +25,11 @@ public class Room {
         this.star = star;
         this.capacityRoom = capacityRoom;
         this.personHistories = new ArrayList<>();
+    }
+
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
@@ -63,7 +68,7 @@ public class Room {
         return capacityRoom;
     }
 
-    public int getStar() {
+    public Integer getStar() {
         return star;
     }
 

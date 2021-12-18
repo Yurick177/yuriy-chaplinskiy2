@@ -30,7 +30,7 @@ public class SupplyServiceImpl implements SupplyService {
 
     public List<Supply> getSuppliesSortedByPrice() {
         List<Supply> supplies = supplyRepository.getSupplies();
-        Comparator<Supply> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
+        Comparator<Supply> comparator = Comparator.comparing(Supply::getPrice);
         supplies.sort(comparator);
         return supplies;
     }

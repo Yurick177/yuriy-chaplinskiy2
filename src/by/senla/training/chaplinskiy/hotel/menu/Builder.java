@@ -422,9 +422,21 @@ public class Builder {
         getFreeNumbersItem.setAction(getFreeNumbers);
         roomMenu.getMenuItems().add(getFreeNumbersItem);
 
+        MenuItem exportFileItem = new MenuItem();
+        exportFileItem.setTitle(" 20 exportFile ");
+        IAction exportFile = roomService::exportFile;
+        exportFileItem.setAction(exportFile);
+        roomMenu.getMenuItems().add(exportFileItem);
+
+        MenuItem importFromFileItem = new MenuItem();
+        importFromFileItem.setTitle(" 21 importFromFile ");
+        IAction importFromFile = roomService::importFromFile;
+        importFromFileItem.setAction(importFromFile);
+        roomMenu.getMenuItems().add(importFromFileItem);
+
         MenuItem rollBackItem = new MenuItem();
         roomMenu.getMenuItems().add(rollBackItem);
-        rollBackItem.setTitle(" 20 вернуться ");
+        rollBackItem.setTitle(" 22 вернуться ");
         IAction rollBack = () -> rootMenu = roomMenuItem.getNextMenu();
         rollBackItem.setAction(rollBack);
 
