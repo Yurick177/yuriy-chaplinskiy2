@@ -4,7 +4,6 @@ import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
-import by.senla.training.chaplinskiy.hotel.exception.LocalDateTimeFromStringException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
@@ -19,7 +18,6 @@ import java.util.Scanner;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
 import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getDate;
-import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 
 public class RoomServiceImpl implements RoomService {
 
@@ -218,12 +216,6 @@ public class RoomServiceImpl implements RoomService {
     public void removePerson(Room room) {
         room.setPerson(null);
         room.setStatus(AVAILABLE);
-    }
-
-    public List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner) {
-        System.out.println("введите id комнаты, по которой выведется история клиентов");
-        long roomId = Long.parseLong(scanner.nextLine());
-        return personHistoryRepository.getPersonHistoriesByRoomId(roomId);
     }
 
 }

@@ -54,6 +54,4 @@ public interface RoomService {
 
     void removePerson(Room room);
 
-    List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner);
-
 }

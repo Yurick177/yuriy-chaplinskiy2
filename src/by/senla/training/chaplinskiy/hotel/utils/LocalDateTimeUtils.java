@@ -12,11 +12,11 @@ public class LocalDateTimeUtils {
         if (split.length != 5) {
             throw new LocalDateTimeFromStringException("Ошибка!!! правильный формат 'yyyy.MM.dd.HH.mm' ");
         }
-        int year = 0;
-        int month = 0;
-        int day = 0;
-        int hour = 0;
-        int minute = 0;
+        int year;
+        int month;
+        int day;
+        int hour;
+        int minute;
         try {
             year = Integer.parseInt(split[0]);
             month = Integer.parseInt(split[1]);
@@ -26,22 +26,22 @@ public class LocalDateTimeUtils {
         } catch (NumberFormatException e) {
             throw new LocalDateTimeFromStringException("Ошибка!!! неправильный формат, вводите цифры");
         }
-        if (year > 9999){
+        if (year > 9999) {
             throw new LocalDateTimeFromStringException("Ошибка!!! год не может быть больше чем 9999");
         }
-        if(month > 12){
+        if (month > 12) {
             throw new LocalDateTimeFromStringException("Ошибка!!! месяцев должно быть не больше, чем 12");
         }
-        if(day > 31){
+        if (day > 31) {
             throw new LocalDateTimeFromStringException("Ошибка!!! дней должно быть не больше 31");
         }
-        if(hour > 24){
+        if (hour > 24) {
             throw new LocalDateTimeFromStringException("Ошибка!!! часы не должны превышать 24");
         }
-        if(minute > 60){
+        if (minute > 60) {
             throw new LocalDateTimeFromStringException("Ошибка!!! минуты не должны превышать 60");
         }
-            return LocalDateTime.of(year, month, day, hour, minute);
+        return LocalDateTime.of(year, month, day, hour, minute);
     }
 
     public static LocalDateTime getDate(Scanner scanner, String s) {

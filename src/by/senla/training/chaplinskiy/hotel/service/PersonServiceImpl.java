@@ -5,20 +5,17 @@ import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
 import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
 import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
-import by.senla.training.chaplinskiy.hotel.exception.LocalDateTimeFromStringException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
 
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getDate;
-import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 
 public class PersonServiceImpl implements PersonService {
 
@@ -91,11 +88,6 @@ public class PersonServiceImpl implements PersonService {
         return price;
     }
 
-    public void addRoom(Room room) {
-        List<Room> rooms = roomRepository.getRooms();
-        rooms.add(room);
-    }
-
     public Long checkInPerson(Scanner scanner) {
         List<Room> rooms = roomRepository.getRooms();
         for (Room room : rooms) {
@@ -158,7 +150,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     private Person getPersonFromString(String line) {
-        String[] split = line.split("\\,");
+        String[] split = line.split(",");
         Long id = Objects.equals(split[0], "") ? null : Long.parseLong(split[0]);
         String name = split[1];
         String lastName = split[2];
@@ -168,14 +160,14 @@ public class PersonServiceImpl implements PersonService {
         return person;
     }
 
-    public void exportFile(){
+    public void exportFile() {
         List<Person> personList = personRepository.getPersons();
         List<String> lines = new ArrayList<>();
-        for (Person person: personList){
+        for (Person person : personList) {
             String line = person.getId() + "," + person.getName() + "," + person.getLastName() + "," + person.getAge();
             lines.add(line);
         }
-       csvWriter.writeLinesToFile(lines,"C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Person_Result.csv");
+        csvWriter.writeLinesToFile(lines, "C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Person_Result.csv");
     }
 
 }

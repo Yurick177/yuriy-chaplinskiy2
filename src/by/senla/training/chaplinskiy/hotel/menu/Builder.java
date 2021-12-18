@@ -2,7 +2,6 @@ package by.senla.training.chaplinskiy.hotel.menu;
 
 import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
-import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
 import by.senla.training.chaplinskiy.hotel.service.*;
@@ -12,15 +11,16 @@ import java.util.Scanner;
 
 public class Builder {
 
-    private static Builder builder ;
+    private static Builder builder;
 
-    private Builder(){
+    private Builder() {
     }
 
-    public static Builder getBuilder(){
-        if(builder == null){
+    public static Builder getBuilder() {
+        if (builder == null) {
             builder = new Builder();
-        }return  builder;
+        }
+        return builder;
     }
 
     private Menu rootMenu = new Menu();
@@ -50,7 +50,7 @@ public class Builder {
 
         MenuItem exitMenuItem = new MenuItem();
         exitMenuItem.setTitle("4 Exit ");
-        IAction exitMenu = ()-> rootMenu = null;
+        IAction exitMenu = () -> rootMenu = null;
         exitMenuItem.setAction(exitMenu);
         rootMenu.getMenuItems().add(exitMenuItem);
     }

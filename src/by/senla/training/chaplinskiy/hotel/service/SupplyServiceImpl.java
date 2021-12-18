@@ -2,8 +2,6 @@ package by.senla.training.chaplinskiy.hotel.service;
 
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
 import by.senla.training.chaplinskiy.hotel.entity.SupplyType;
-import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
-import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepository;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
@@ -17,11 +15,10 @@ public class SupplyServiceImpl implements SupplyService {
 
     private static SupplyServiceImpl supplyService = null;
     private final SupplyRepository supplyRepository;
-    private final RoomRepository roomRepository;
 
     private SupplyServiceImpl() {
         this.supplyRepository = SupplyRepositoryImpl.getSupplyRepository();
-        this.roomRepository = RoomRepositoryImpl.getRoomRepository();
+
     }
 
     public static SupplyServiceImpl getSupplyService() {
@@ -29,10 +26,6 @@ public class SupplyServiceImpl implements SupplyService {
             supplyService = new SupplyServiceImpl();
         }
         return supplyService;
-    }
-
-    public List<Supply> getSupplies() {
-        return supplyRepository.getSupplies();
     }
 
     public List<Supply> getSuppliesSortedByPrice() {
@@ -72,8 +65,7 @@ public class SupplyServiceImpl implements SupplyService {
             addSupply(scanner);
         }
         Supply supply = new Supply(supplyType1, price);
-        Long id = supplyRepository.addSupply(supply);
-        return id;
+        return supplyRepository.addSupply(supply);
     }
 
     public void update(Scanner scanner) {
@@ -83,7 +75,7 @@ public class SupplyServiceImpl implements SupplyService {
         int price = 0;
         try {
             price = Integer.parseInt(scanner.nextLine());
-        } catch ( NumberFormatException r) {
+        } catch (NumberFormatException r) {
             System.out.println("Ошибка!!! вводите только цифры");
             update(scanner);
         }

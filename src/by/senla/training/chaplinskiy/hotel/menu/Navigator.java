@@ -18,10 +18,6 @@ public class Navigator {
         return navigator;
     }
 
-    public Menu getCurrentMenu() {
-        return currentMenu;
-    }
-
     public void setCurrentMenu(Menu currentMenu) {
         this.currentMenu = currentMenu;
     }
@@ -41,7 +37,7 @@ public class Navigator {
             List<MenuItem> menuItems = currentMenu.getMenuItems();
             MenuItem menuItem = menuItems.get(index - 1);
             System.out.println("Вы выбрали " + menuItem.getTitle());
-            menuItem.getAction().execute();
+            menuItem.doAction();
         } catch (NumberFormatException numberFormatException) {
             System.out.println("Вы ввели не тот символ");
             navigate(scan);

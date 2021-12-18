@@ -9,7 +9,6 @@ import java.util.Scanner;
 public class CsvReader {
 
     private static CsvReader csvReader;
-    private FileReader fileReader;
 
     private CsvReader() {
     }

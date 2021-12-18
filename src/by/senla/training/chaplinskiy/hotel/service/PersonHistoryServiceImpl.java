@@ -14,11 +14,9 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
 
     private static PersonHistoryService personHistoryService = null;
     private final PersonHistoryRepository personHistoryRepository;
-    private final RoomRepository roomRepository;
     private final PersonRepository personRepository;
 
     private PersonHistoryServiceImpl() {
-        this.roomRepository = RoomRepositoryImpl.getRoomRepository();
         this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
     }
@@ -52,4 +50,5 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
         return personHistoryDtos;
 
     }
+
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PersonRepositoryImpl implements PersonRepository {
 
-    private List<Person> persons;
+    private final List<Person> persons;
     private static PersonRepositoryImpl personRepository = null;
 
     private PersonRepositoryImpl() {
@@ -16,10 +16,6 @@ public class PersonRepositoryImpl implements PersonRepository {
 
     public List<Person> getPersons() {
         return persons;
-    }
-
-    public void setPersons(List<Person> persons) {
-        this.persons = persons;
     }
 
     public static PersonRepositoryImpl getPersonRepository() {

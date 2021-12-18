@@ -8,8 +8,6 @@ public interface PersonRepository {
 
     List<Person> getPersons();
 
-    void setPersons(List<Person> persons);
-
     Long addPerson(Person person);
 
     Person getPersonById(Long id);

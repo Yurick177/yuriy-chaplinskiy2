@@ -8,8 +8,6 @@ public interface RoomRepository {
 
     List<Room> getRooms();
 
-    void setRooms(List<Room> rooms);
-
     Room getRoomById(Long id);
 
 }

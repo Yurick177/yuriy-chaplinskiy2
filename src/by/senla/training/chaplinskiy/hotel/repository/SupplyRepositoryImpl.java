@@ -45,10 +45,7 @@ public class SupplyRepositoryImpl implements SupplyRepository {
     }
 
     public void update(Supply supply) {
-        Supply currentSupply = supplies.stream().filter(a -> a.getId().equals(supply.getId())).findFirst().orElse(null);
-        if (currentSupply != null) {
-            currentSupply.setPrice(supply.getPrice());
-        }
+        supplies.stream().filter(a -> a.getId().equals(supply.getId())).findFirst().ifPresent(currentSupply -> currentSupply.setPrice(supply.getPrice()));
     }
 
     public void remove(Long id) {

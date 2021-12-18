@@ -5,22 +5,17 @@ import by.senla.training.chaplinskiy.hotel.entity.Room;
 import java.util.ArrayList;
 import java.util.List;
 
-import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
-
 public class RoomRepositoryImpl implements RoomRepository {
 
-    private List<Room> rooms;
+    private final List<Room> rooms;
     private static RoomRepositoryImpl roomRepository = null;
 
-    public List<Room> getRooms() {
-        if (rooms == null) {
-            rooms = new ArrayList<>();
-        }
-        return rooms;
+    private RoomRepositoryImpl() {
+        this.rooms = new ArrayList<>();
     }
 
-    public void setRooms(List<Room> rooms) {
-        this.rooms = rooms;
+    public List<Room> getRooms() {
+        return rooms;
     }
 
     public static RoomRepositoryImpl getRoomRepository() {
@@ -28,11 +23,6 @@ public class RoomRepositoryImpl implements RoomRepository {
             roomRepository = new RoomRepositoryImpl();
         }
         return roomRepository;
-    }
-
-    public void removePerson(Room room) {
-        room.setPerson(null);
-        room.setStatus(AVAILABLE);
     }
 
     public Room getRoomById(Long id) {
