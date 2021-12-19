@@ -259,8 +259,7 @@ public class RoomServiceImpl implements RoomService {
         int price = Integer.parseInt(split[2]);
         int star = Integer.parseInt(split[3]);
         int capacityRoom = Integer.parseInt(split[4]);
-        Room room = new Room(status, price, id, star, capacityRoom);
-        return room;
+        return new Room(status, price, id, star, capacityRoom);
     }
 
 }

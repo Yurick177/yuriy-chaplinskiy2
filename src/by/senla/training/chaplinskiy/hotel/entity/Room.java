@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Room {
 
-    private  Long id;
+    private Long id;
     private List<PersonHistory> personHistories;
     private LocalDateTime releaseDate;
     private LocalDateTime checkInDate;

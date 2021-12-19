@@ -1,7 +1,5 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
-import by.senla.training.chaplinskiy.hotel.entity.Room;
-import by.senla.training.chaplinskiy.hotel.entity.Status;
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
 import by.senla.training.chaplinskiy.hotel.entity.SupplyType;
 import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
@@ -136,7 +134,7 @@ public class SupplyServiceImpl implements SupplyService {
         Long id = Objects.equals(split[0], "") ? null : Long.parseLong(split[0]);
         SupplyType serviceType = SupplyType.valueOf(split[1]);
         int price = Integer.parseInt(split[2]);
-        Supply supply = new Supply(serviceType,price);
+        Supply supply = new Supply(serviceType, price);
         supply.setId(id);
         return supply;
     }

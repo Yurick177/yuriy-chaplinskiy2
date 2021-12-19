@@ -1,8 +1,6 @@
 package by.senla.training.chaplinskiy.hotel.repository;
 
-import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
-import by.senla.training.chaplinskiy.hotel.entity.Status;
 
 import java.util.ArrayList;
 import java.util.List;

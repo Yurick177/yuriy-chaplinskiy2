@@ -1,7 +1,6 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
 import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
-import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 
 import java.util.List;
 import java.util.Scanner;
