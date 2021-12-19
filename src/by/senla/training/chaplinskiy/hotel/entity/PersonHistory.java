@@ -40,4 +40,5 @@ public class PersonHistory {
     public Long getRoomId() {
         return roomId;
     }
+
 }

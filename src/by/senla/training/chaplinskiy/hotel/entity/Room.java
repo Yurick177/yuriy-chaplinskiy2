@@ -27,7 +27,6 @@ public class Room {
         this.personHistories = new ArrayList<>();
     }
 
-
     public void setId(Long id) {
         this.id = id;
     }

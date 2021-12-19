@@ -57,4 +57,15 @@ public class SupplyRepositoryImpl implements SupplyRepository {
         return supplies.stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
     }
 
+    public List<Supply> addAll(List<Supply> supplies) {
+        for (Supply supply : supplies) {
+            if (supply.getId() == null) {
+                addSupply(supply);
+            } else {
+                update(supply);
+            }
+        }
+        return supplies;
+    }
+
 }

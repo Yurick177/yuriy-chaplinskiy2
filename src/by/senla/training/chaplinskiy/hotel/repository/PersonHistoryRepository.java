@@ -10,4 +10,6 @@ public interface PersonHistoryRepository {
 
     List<PersonHistory> getPersonHistoriesByRoomId(Long roomId);
 
+    List<PersonHistory> getAll();
+
 }

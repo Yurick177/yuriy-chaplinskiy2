@@ -48,8 +48,12 @@ public class Builder {
         supplyMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(supplyMenuItem);
 
+        MenuItem personHistoryMenuItem = getPersonHistoryMenuItem();
+        personHistoryMenuItem.setNextMenu(rootMenu);
+        rootMenu.getMenuItems().add(personHistoryMenuItem);
+
         MenuItem exitMenuItem = new MenuItem();
-        exitMenuItem.setTitle("4 Exit ");
+        exitMenuItem.setTitle("5 Exit ");
         IAction exitMenu = () -> rootMenu = null;
         exitMenuItem.setAction(exitMenu);
         rootMenu.getMenuItems().add(exitMenuItem);
@@ -124,9 +128,21 @@ public class Builder {
         getByIdSupplyItem.setAction(getByIdSupply);
         supplyMenu.getMenuItems().add(getByIdSupplyItem);
 
+        MenuItem exportFileItem = new MenuItem();
+        exportFileItem.setTitle(" 8 exportFile ");
+        IAction exportFile = supplyService::exportFile;
+        exportFileItem.setAction(exportFile);
+        supplyMenu.getMenuItems().add(exportFileItem);
+
+        MenuItem importFromFileItem = new MenuItem();
+        importFromFileItem.setTitle(" 9 importFromFile ");
+        IAction importFromFile = supplyService::importFromFile;
+        importFromFileItem.setAction(importFromFile);
+        supplyMenu.getMenuItems().add(importFromFileItem);
+
         MenuItem rollBackSupplyItem = new MenuItem();
         supplyMenu.getMenuItems().add(rollBackSupplyItem);
-        rollBackSupplyItem.setTitle(" 8 вернуться ");
+        rollBackSupplyItem.setTitle(" 10 вернуться ");
         IAction rollBackSupply = () -> rootMenu = supplyMenuItem.getNextMenu();
         rollBackSupplyItem.setAction(rollBackSupply);
 
@@ -444,6 +460,31 @@ public class Builder {
         IAction roomMenuAction = () -> rootMenu = roomMenu;
         roomMenuItem.setAction(roomMenuAction);
         return roomMenuItem;
+
+    }
+
+    private MenuItem getPersonHistoryMenuItem() {
+        MenuItem personHistoryMenuItem = new MenuItem();
+        personHistoryMenuItem.setNextMenu(rootMenu);
+        personHistoryMenuItem.setTitle("4 PersonHistoryMenu");
+        Menu personHistoryMenu = new Menu();
+
+        MenuItem personHistoryExportItem = new MenuItem();
+        personHistoryExportItem.setTitle(" 1 Export ");
+        IAction personHistoryExport = personHistoryService::exportFile;
+        personHistoryExportItem.setAction(personHistoryExport);
+        personHistoryMenu.getMenuItems().add(personHistoryExportItem);
+
+        MenuItem rollBackItem = new MenuItem();
+        personHistoryMenu.getMenuItems().add(rollBackItem);
+        rollBackItem.setTitle(" 2 вернуться ");
+        IAction rollBack = () -> rootMenu = personHistoryMenuItem.getNextMenu();
+        rollBackItem.setAction(rollBack);
+
+        personHistoryMenuItem.setNextMenu(personHistoryMenu);
+        IAction roomMenuAction = () -> rootMenu = personHistoryMenu;
+        personHistoryMenuItem.setAction(roomMenuAction);
+        return personHistoryMenuItem;
     }
 
 }

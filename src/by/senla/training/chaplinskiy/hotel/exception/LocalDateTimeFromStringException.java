@@ -4,7 +4,6 @@ public class LocalDateTimeFromStringException extends Exception {
 
     public LocalDateTimeFromStringException(String errorMessage) {
         super(errorMessage);
-
     }
 
 }

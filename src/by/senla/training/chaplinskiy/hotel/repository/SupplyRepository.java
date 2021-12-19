@@ -20,4 +20,6 @@ public interface SupplyRepository {
 
     Supply getById(Long id);
 
+    List<Supply> addAll(List<Supply> supplies);
+
 }

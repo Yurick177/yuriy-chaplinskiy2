@@ -49,4 +49,5 @@ public class RoomSupply {
     public void setPersonId(Long personId) {
         this.personId = personId;
     }
+
 }

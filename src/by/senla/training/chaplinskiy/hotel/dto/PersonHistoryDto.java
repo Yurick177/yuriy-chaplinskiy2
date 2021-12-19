@@ -67,4 +67,5 @@ public class PersonHistoryDto {
     public void setPersonLastName(String personLastName) {
         this.personLastName = personLastName;
     }
+
 }

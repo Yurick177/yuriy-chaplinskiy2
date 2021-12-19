@@ -32,4 +32,8 @@ public class PersonHistoryRepositoryImpl implements PersonHistoryRepository {
         return personHistoryList.stream().filter(a -> a.getRoomId().equals(roomId)).collect(Collectors.toList());
     }
 
+    public List<PersonHistory> getAll(){
+        return personHistoryList;
+    }
+
 }

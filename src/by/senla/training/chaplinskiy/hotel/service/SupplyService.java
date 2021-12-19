@@ -21,4 +21,8 @@ public interface SupplyService {
 
     Supply getById(Scanner scanner);
 
+    void exportFile();
+
+    void importFromFile();
+
 }
