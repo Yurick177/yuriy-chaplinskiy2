@@ -1,6 +1,7 @@
 package by.senla.training.chaplinskiy.hotel.repository;
 
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface SupplyRepository {
 
     void remove(Long id);
 
-    Supply getById(Long id);
+    Supply getById(Long id) throws EntityNotFoundException;
 
     List<Supply> addAll(List<Supply> supplies);
 

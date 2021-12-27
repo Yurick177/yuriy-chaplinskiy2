@@ -4,6 +4,7 @@ import by.senla.training.chaplinskiy.hotel.entity.Supply;
 import by.senla.training.chaplinskiy.hotel.entity.SupplyType;
 import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
 import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepository;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
@@ -17,11 +18,13 @@ public class SupplyServiceImpl implements SupplyService {
     private final SupplyRepository supplyRepository;
     private final CsvWriter csvWriter;
     private final CsvReader csvReader;
+    private final PropertiesService propertiesService;
 
     private SupplyServiceImpl() {
         this.supplyRepository = SupplyRepositoryImpl.getSupplyRepository();
         this.csvWriter = CsvWriter.getCsvWriter();
         this.csvReader = CsvReader.getCsvReader();
+        this.propertiesService = PropertiesService.getPropertiesService();
     }
 
     public static SupplyServiceImpl getSupplyService() {
@@ -96,7 +99,12 @@ public class SupplyServiceImpl implements SupplyService {
     public Supply getById(Scanner scanner) {
         System.out.println(" введите id услуги ");
         Long id = ScannerUtils.getLongFromConsole(scanner);
-        return supplyRepository.getById(id);
+        try {
+            return supplyRepository.getById(id);
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 
     public void exportFile() {
@@ -107,12 +115,12 @@ public class SupplyServiceImpl implements SupplyService {
             String line = supply.getId() + "," + supply.getServiceType() + "," + supply.getPrice();
             lines.add(line);
         }
-        csvWriter.writeLinesToFile(lines, "C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Supply_Result.csv");
+        csvWriter.writeLinesToFile(lines, propertiesService.getValue("supplyResultPath"));
     }
 
     public void importFromFile() {
         try {
-            List<String> lineFromString = csvReader.getLinesFromFile("C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Supply.csv");
+            List<String> lineFromString = csvReader.getLinesFromFile(propertiesService.getValue("supplyPath"));
             List<Supply> supplyList = getSuppliesFromStrings(lineFromString);
             supplyRepository.addAll(supplyList);
         } catch (FileNotFoundException e) {

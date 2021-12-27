@@ -4,6 +4,7 @@ import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
@@ -20,11 +21,13 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
     private final PersonHistoryRepository personHistoryRepository;
     private final PersonRepository personRepository;
     private final CsvWriter csvWriter;
+    private final PropertiesService propertiesService;
 
     private PersonHistoryServiceImpl() {
         this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
         this.csvWriter = CsvWriter.getCsvWriter();
+        this.propertiesService = PropertiesService.getPropertiesService();
     }
 
     public static PersonHistoryService getPersonHistoryService() {
@@ -47,9 +50,15 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
             personHistoryDto.setReleaseDate(i.getReleaseDate());
             personHistoryDto.setCheckInDate(i.getCheckInDate());
             personHistoryDto.setRoomId(i.getRoomId());
-            Person person = personRepository.getPersonById(i.getPersonId());
-            personHistoryDto.setPersonFirstName(person.getName());
-            personHistoryDto.setPersonLastName(person.getLastName());
+
+            try {
+                Person person = personRepository.getPersonById(i.getPersonId());
+                personHistoryDto.setPersonFirstName(person.getName());
+                personHistoryDto.setPersonLastName(person.getLastName());
+
+            } catch (EntityNotFoundException e) {
+                System.out.println("Такого человека по Id " + i.getPersonId() + " не найден");
+            }
             personHistoryDtos.add(personHistoryDto);
         }
         return personHistoryDtos;
@@ -63,7 +72,18 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
             String line = personHistory.getId() + "," + personHistory.getPersonId() + "," + personHistory.getReleaseDate() + "," + personHistory.getCheckInDate() + "," + personHistory.getRoomId();
             lines.add(line);
         }
-        csvWriter.writeLinesToFile(lines, "C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\PersonHistory_Result.csv");
+        csvWriter.writeLinesToFile(lines, propertiesService.getValue("personHistoryResultPath"));
+    }
+
+    public void addPersonHistory(PersonHistory personHistory) {
+        List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(personHistory.getRoomId());
+        String personHistorySize = propertiesService.getValue("personHistorySize");
+        int size = Integer.parseInt(personHistorySize);
+        if (size >= personHistoriesByRoomId.size()) {
+            long id = personHistoriesByRoomId.stream().mapToLong(PersonHistory::getId).min().orElse(0);
+            personHistoryRepository.removeById(id);
+        }
+        personHistoryRepository.addPersonHistory(personHistory);
     }
 
 }

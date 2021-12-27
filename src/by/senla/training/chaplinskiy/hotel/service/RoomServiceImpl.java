@@ -6,10 +6,10 @@ import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
 import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
 import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
-import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
-import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
@@ -22,16 +22,18 @@ import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getDa
 public class RoomServiceImpl implements RoomService {
 
     private static RoomService roomService = null;
-    private final PersonHistoryRepository personHistoryRepository;
+    private final PersonHistoryService personHistoryService;
     private final RoomRepository roomRepository;
     private final CsvWriter csvWriter;
     private final CsvReader csvReader;
+    private final PropertiesService propertiesService;
 
     private RoomServiceImpl() {
         this.roomRepository = RoomRepositoryImpl.getRoomRepository();
-        this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
+        this.personHistoryService = PersonHistoryServiceImpl.getPersonHistoryService();
         this.csvWriter = CsvWriter.getCsvWriter();
         this.csvReader = CsvReader.getCsvReader();
+        this.propertiesService = PropertiesService.getPropertiesService();
     }
 
     public static RoomService getRoomService() {
@@ -211,7 +213,7 @@ public class RoomServiceImpl implements RoomService {
         room.setReleaseDate(releaseDate);
         room.setCheckInDate(checkInDate);
         PersonHistory personHistory = new PersonHistory(person.getId(), releaseDate, checkInDate, room.getId());
-        personHistoryRepository.addPersonHistory(personHistory);
+        personHistoryService.addPersonHistory(personHistory);
         room.getPersonHistories().add(personHistory);
 
     }
@@ -230,12 +232,12 @@ public class RoomServiceImpl implements RoomService {
             String line = room.getId() + "," + room.getStatus() + "," + room.getPrice() + "," + room.getStar() + "," + room.getCapacityRoom();
             lines.add(line);
         }
-        csvWriter.writeLinesToFile(lines, "C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Room_Result.csv");
+        csvWriter.writeLinesToFile(lines, propertiesService.getValue("roomResultPath"));
     }
 
     public void importFromFile() {
         try {
-            List<String> lineFromString = csvReader.getLinesFromFile("C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Room.csv");
+            List<String> lineFromString = csvReader.getLinesFromFile(propertiesService.getValue("roomPath"));
             List<Room> roomList = getRoomsFromStrings(lineFromString);
             roomRepository.addAll(roomList);
         } catch (FileNotFoundException e) {
@@ -260,6 +262,21 @@ public class RoomServiceImpl implements RoomService {
         int star = Integer.parseInt(split[3]);
         int capacityRoom = Integer.parseInt(split[4]);
         return new Room(status, price, id, star, capacityRoom);
+    }
+
+    public void changeStatus(Scanner scanner) {
+        System.out.println("введите id комнаты ");
+        Long id = ScannerUtils.getLongFromConsole(scanner);
+        try {
+            Room roomById = roomRepository.getRoomById(id);
+            System.out.println("введите статус");
+            Status status = Status.valueOf(scanner.nextLine());
+            roomById.setStatus(status);
+            roomRepository.update(roomById);
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
+            changeStatus(scanner);
+        }
     }
 
 }

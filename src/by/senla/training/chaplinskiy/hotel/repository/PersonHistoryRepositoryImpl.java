@@ -4,12 +4,13 @@ import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PersonHistoryRepositoryImpl implements PersonHistoryRepository {
 
     private static PersonHistoryRepositoryImpl personHistoryRepository = null;
-    private final List<PersonHistory> personHistoryList;
+    private List<PersonHistory> personHistoryList;
 
     private PersonHistoryRepositoryImpl() {
         this.personHistoryList = new ArrayList<>();
@@ -34,6 +35,16 @@ public class PersonHistoryRepositoryImpl implements PersonHistoryRepository {
 
     public List<PersonHistory> getAll() {
         return personHistoryList;
+    }
+
+    public void removeById(Long id) {
+        List<PersonHistory> personHistoryNewList = new ArrayList<>();
+        for (PersonHistory personHistory : personHistoryList) {
+            if (!Objects.equals(personHistory.getId(), id)) {
+                personHistoryNewList.add(personHistory);
+            }
+        }
+        personHistoryList = personHistoryNewList;
     }
 
 }

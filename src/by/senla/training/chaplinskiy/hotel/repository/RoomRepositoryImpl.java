@@ -1,6 +1,7 @@
 package by.senla.training.chaplinskiy.hotel.repository;
 
 import by.senla.training.chaplinskiy.hotel.entity.Room;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +26,8 @@ public class RoomRepositoryImpl implements RoomRepository {
         return roomRepository;
     }
 
-    public Room getRoomById(Long id) {
-        return rooms.stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
+    public Room getRoomById(Long id) throws EntityNotFoundException {
+        return rooms.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(()->new EntityNotFoundException("Комната по такому id не найдена"));
     }
 
     public List<Room> addAll(List<Room> rooms) {
@@ -41,15 +42,15 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     public void update(Room room) {
-        Room current = getRoomById(room.getId());
-        if (current == null) {
-            System.out.println("Такого человека по Id " + room.getId() + " не найден");
-        } else {
+        try {
+            Room current = getRoomById(room.getId());
             current.setStatus(room.getStatus());
             current.setPrice(room.getPrice());
             current.setId(room.getId());
             current.setStar(room.getStar());
             current.setCapacityRoom(room.getCapacityRoom());
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 

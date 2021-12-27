@@ -12,4 +12,6 @@ public interface PersonHistoryRepository {
 
     List<PersonHistory> getAll();
 
+    void removeById(Long id);
+
 }

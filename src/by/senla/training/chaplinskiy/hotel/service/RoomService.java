@@ -57,4 +57,6 @@ public interface RoomService {
 
     void importFromFile();
 
+    void changeStatus(Scanner scanner);
+
 }

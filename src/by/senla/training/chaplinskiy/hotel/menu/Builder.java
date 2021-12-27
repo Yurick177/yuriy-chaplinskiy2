@@ -12,8 +12,10 @@ import java.util.Scanner;
 public class Builder {
 
     private static Builder builder;
+    private final PropertiesService propertiesService;
 
     private Builder() {
+        this.propertiesService = PropertiesService.getPropertiesService();
     }
 
     public static Builder getBuilder() {
@@ -121,8 +123,6 @@ public class Builder {
             Supply supply = supplyService.getById(scan);
             if (supply != null) {
                 System.out.println(supply.getId() + " " + supply.getPrice() + " " + supply.getServiceType());
-            } else {
-                System.out.println("услугу по такому id не нашли");
             }
         };
         getByIdSupplyItem.setAction(getByIdSupply);
@@ -438,21 +438,34 @@ public class Builder {
         getFreeNumbersItem.setAction(getFreeNumbers);
         roomMenu.getMenuItems().add(getFreeNumbersItem);
 
+        MenuItem changeStatusItem = new MenuItem();
+        changeStatusItem.setTitle(" 20 changeStatus");
+        IAction changeStatus = () -> {
+            String changeStatusAvailable = propertiesService.getValue("changeStatusAvailable");
+            if (changeStatusAvailable.equals("true")) {
+                roomService.changeStatus(scan);
+            } else {
+                System.out.println("смена статуса запрещена !!!");
+            }
+        };
+        changeStatusItem.setAction(changeStatus);
+        roomMenu.getMenuItems().add(changeStatusItem);
+
         MenuItem exportFileItem = new MenuItem();
-        exportFileItem.setTitle(" 20 exportFile ");
+        exportFileItem.setTitle(" 21 exportFile ");
         IAction exportFile = roomService::exportFile;
         exportFileItem.setAction(exportFile);
         roomMenu.getMenuItems().add(exportFileItem);
 
         MenuItem importFromFileItem = new MenuItem();
-        importFromFileItem.setTitle(" 21 importFromFile ");
+        importFromFileItem.setTitle(" 22 importFromFile ");
         IAction importFromFile = roomService::importFromFile;
         importFromFileItem.setAction(importFromFile);
         roomMenu.getMenuItems().add(importFromFileItem);
 
         MenuItem rollBackItem = new MenuItem();
         roomMenu.getMenuItems().add(rollBackItem);
-        rollBackItem.setTitle(" 22 вернуться ");
+        rollBackItem.setTitle(" 23 вернуться ");
         IAction rollBack = () -> rootMenu = roomMenuItem.getNextMenu();
         rollBackItem.setAction(rollBack);
 
@@ -462,6 +475,7 @@ public class Builder {
         return roomMenuItem;
 
     }
+
 
     private MenuItem getPersonHistoryMenuItem() {
         MenuItem personHistoryMenuItem = new MenuItem();

@@ -5,6 +5,7 @@ import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
 import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
 import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
@@ -25,6 +26,7 @@ public class PersonServiceImpl implements PersonService {
     private final RoomService roomService;
     private final CsvReader csvReader;
     private final CsvWriter csvWriter;
+    private final PropertiesService propertiesService;
 
     public PersonServiceImpl() {
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
@@ -32,6 +34,7 @@ public class PersonServiceImpl implements PersonService {
         this.roomService = RoomServiceImpl.getRoomService();
         this.csvReader = CsvReader.getCsvReader();
         this.csvWriter = CsvWriter.getCsvWriter();
+        this.propertiesService = PropertiesService.getPropertiesService();
     }
 
     public static PersonService getPersonService() {
@@ -66,7 +69,13 @@ public class PersonServiceImpl implements PersonService {
     public int getTotalPrice(Scanner scanner) {
         System.out.println("введите Id клиента");
         Long personId = Long.parseLong(scanner.nextLine());
-        Person person = personRepository.getPersonById(personId);
+        Person person = null;
+        try {
+            person = personRepository.getPersonById(personId);
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
+            getTotalPrice(scanner);
+        }
         List<Room> rooms = roomRepository.getRooms();
         List<Room> personRooms = new ArrayList<>();
         for (Room i : rooms) {
@@ -94,7 +103,13 @@ public class PersonServiceImpl implements PersonService {
             if (room.getStatus().equals(Status.AVAILABLE)) {
                 System.out.println("введите id пользователя ");
                 Long id = Long.parseLong(scanner.nextLine());
-                Person person = personRepository.getPersonById(id);
+                Person person = null;
+                try {
+                    person = personRepository.getPersonById(id);
+                } catch (EntityNotFoundException e) {
+                    System.out.println(e.getMessage());
+                    checkInPerson(scanner);
+                }
                 LocalDateTime checkInDate = getDate(scanner, "введите год.месяц.день.часы.минуты заселения");
                 LocalDateTime releaseDate = getDate(scanner, "введите год.месяц.день.часы.минуты выселения");
                 roomService.addPerson(room, person, checkInDate, releaseDate);
@@ -104,35 +119,38 @@ public class PersonServiceImpl implements PersonService {
         return null;
     }
 
-
     public void checkOutPerson(Scanner scanner) {
         System.out.println("введите id клиента ");
         Long personId = Long.parseLong(scanner.nextLine());
-        Person personById = personRepository.getPersonById(personId);
-        if (personById != null) {
-            System.out.println("введите id комнаты");
-            Long roomId = Long.parseLong(scanner.nextLine());
+        try {
+            personRepository.getPersonById(personId);
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
+            checkOutPerson(scanner);
+        }
+
+        System.out.println("введите id комнаты");
+        Long roomId = Long.parseLong(scanner.nextLine());
+
+        try {
+
             Room roomById = roomRepository.getRoomById(roomId);
-            if (roomById != null) {
-                Person person = roomById.getPerson();
-                if (person != null && person.getId().equals(personId)) {
-                    roomService.removePerson(roomById);
-                    System.out.println("выселен из комнаты");
-                } else {
-                    System.out.println("в этой комнате человек не проживает");
-                }
+            Person person = roomById.getPerson();
+            if (person != null && person.getId().equals(personId)) {
+                roomService.removePerson(roomById);
+                System.out.println("выселен из комнаты");
             } else {
-                System.out.println("комната по id не найдена ");
+                System.out.println("в этой комнате человек не проживает");
             }
-        } else {
-            System.out.println("клиент по id не найден ");
+        } catch (EntityNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     @Override
     public void importFromFile() {
         try {
-            List<String> linesFromFile = csvReader.getLinesFromFile("C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Person.csv");
+            List<String> linesFromFile = csvReader.getLinesFromFile(propertiesService.getValue("personPath"));
             List<Person> personList = getPersonsFromStrings(linesFromFile);
             personRepository.addAllPerson(personList);
         } catch (FileNotFoundException e) {
@@ -168,7 +186,7 @@ public class PersonServiceImpl implements PersonService {
             String line = person.getId() + "," + person.getName() + "," + person.getLastName() + "," + person.getAge();
             lines.add(line);
         }
-        csvWriter.writeLinesToFile(lines, "C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\Person_Result.csv");
+        csvWriter.writeLinesToFile(lines, propertiesService.getValue("personResultPath"));
     }
 
 }
