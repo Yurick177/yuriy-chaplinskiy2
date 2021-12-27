@@ -16,7 +16,7 @@ public class PropertiesService {
         CsvReader csvReader = CsvReader.getCsvReader();
         properties = new HashMap<>();
         try {
-            List<String> linesFromFile = csvReader.getLinesFromFile("C:\\Users\\Ura\\IdeaProjects\\yuriy-chaplinskiy1\\resources\\hotel.properties");
+            List<String> linesFromFile = csvReader.getLinesFromFile("resources/hotel.properties");
             for (String line : linesFromFile){
                 if(line!= null && line.length()>0){
                     String[] split = line.split("=");

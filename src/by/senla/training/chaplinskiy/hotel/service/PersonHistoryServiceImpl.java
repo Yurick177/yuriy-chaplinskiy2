@@ -79,7 +79,7 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
         List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(personHistory.getRoomId());
         String personHistorySize = propertiesService.getValue("personHistorySize");
         int size = Integer.parseInt(personHistorySize);
-        if (size >= personHistoriesByRoomId.size()) {
+        if (personHistoriesByRoomId.size() >= size) {
             long id = personHistoriesByRoomId.stream().mapToLong(PersonHistory::getId).min().orElse(0);
             personHistoryRepository.removeById(id);
         }
