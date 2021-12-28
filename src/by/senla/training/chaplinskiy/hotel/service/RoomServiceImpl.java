@@ -1,23 +1,26 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
+import by.senla.training.chaplinskiy.hotel.converter.RoomCsvConverter;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
-import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
-import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
+import by.senla.training.chaplinskiy.hotel.exception.CustomRuntimeException;
 import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
-import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvReader;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvWriter;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
-import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getDate;
 
 public class RoomServiceImpl implements RoomService {
 
@@ -27,6 +30,7 @@ public class RoomServiceImpl implements RoomService {
     private final CsvWriter csvWriter;
     private final CsvReader csvReader;
     private final PropertiesService propertiesService;
+    private final CsvConverter<Room> csvConverter;
 
     private RoomServiceImpl() {
         this.roomRepository = RoomRepositoryImpl.getRoomRepository();
@@ -34,6 +38,7 @@ public class RoomServiceImpl implements RoomService {
         this.csvWriter = CsvWriter.getCsvWriter();
         this.csvReader = CsvReader.getCsvReader();
         this.propertiesService = PropertiesService.getPropertiesService();
+        this.csvConverter = RoomCsvConverter.getRoomCsvConverter();
     }
 
     public static RoomService getRoomService() {
@@ -43,23 +48,8 @@ public class RoomServiceImpl implements RoomService {
         return roomService;
     }
 
-    public Room createRoom(Scanner scanner) {
-        System.out.println("Введите статус комнаты");
-        for (Status status : Status.values()) {
-            System.out.println(status.name());
-        }
-        String statusString = scanner.nextLine();
-        Status status = Status.valueOf(statusString);
-        System.out.println("введите цену");
-        String price = scanner.nextLine();
-        System.out.println("введите номер комнаты");
-        String id = scanner.nextLine();
-        System.out.println("введите звезду");
-        String star = scanner.nextLine();
-        System.out.println("введите вместимость");
-        String capacityRoom = scanner.nextLine();
-
-        Room room = new Room(status, Integer.parseInt(price), Long.parseLong(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
+    public Room createRoom(Status status, int price, long id, int star, int capacityRoom) {
+        Room room = new Room(status, price, id, star, capacityRoom);
         roomRepository.getRooms().add(room);
         return room;
     }
@@ -195,8 +185,7 @@ public class RoomServiceImpl implements RoomService {
         return freeNumbers.size();
     }
 
-    public List<Room> getAvailableRoomsByDate(Scanner scanner) {
-        LocalDateTime localDateTime = getDate(scanner, "введите год.месяц.день.часы.минуты заселения");
+    public List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime) {
         List<Room> rooms = roomRepository.getRooms();
         List<Room> result = new ArrayList<>();
         for (Room i : rooms) {
@@ -226,57 +215,25 @@ public class RoomServiceImpl implements RoomService {
 
     public void exportFile() {
         List<Room> roomList = roomService.getRooms();
-        List<String> lines = new ArrayList<>();
-        lines.add("id,status,price,star,capacityRoom");
-        for (Room room : roomList) {
-            String line = room.getId() + "," + room.getStatus() + "," + room.getPrice() + "," + room.getStar() + "," + room.getCapacityRoom();
-            lines.add(line);
-        }
+        List<String> lines = csvConverter.getStrings(roomList);
         csvWriter.writeLinesToFile(lines, propertiesService.getValue("roomResultPath"));
     }
 
     public void importFromFile() {
         try {
             List<String> lineFromString = csvReader.getLinesFromFile(propertiesService.getValue("roomPath"));
-            List<Room> roomList = getRoomsFromStrings(lineFromString);
+            List<Room> roomList = csvConverter.getFromStrings(lineFromString);
             roomRepository.addAll(roomList);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("Не правильный путь к файлу");
+            throw new CustomRuntimeException("Не правильный путь к файлу");
         }
     }
 
-    private List<Room> getRoomsFromStrings(List<String> lines) {
-        List<Room> roomsList = new ArrayList<>();
-        for (int i = 1; i < lines.size(); i++) {
-            Room room = getRoomFromString(lines.get(i));
-            roomsList.add(room);
-        }
-        return roomsList;
-    }
 
-    private Room getRoomFromString(String line) {
-        String[] split = line.split(",");
-        Long id = Objects.equals(split[0], "") ? null : Long.parseLong(split[0]);
-        Status status = Status.valueOf(split[1]);
-        int price = Integer.parseInt(split[2]);
-        int star = Integer.parseInt(split[3]);
-        int capacityRoom = Integer.parseInt(split[4]);
-        return new Room(status, price, id, star, capacityRoom);
-    }
-
-    public void changeStatus(Scanner scanner) {
-        System.out.println("введите id комнаты ");
-        Long id = ScannerUtils.getLongFromConsole(scanner);
-        try {
-            Room roomById = roomRepository.getRoomById(id);
-            System.out.println("введите статус");
-            Status status = Status.valueOf(scanner.nextLine());
-            roomById.setStatus(status);
-            roomRepository.update(roomById);
-        } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
-            changeStatus(scanner);
-        }
+    public void changeStatus(Long id, Status status) throws EntityNotFoundException {
+        Room roomById = roomRepository.getRoomById(id);
+        roomById.setStatus(status);
+        roomRepository.update(roomById);
     }
 
 }

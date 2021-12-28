@@ -1,4 +1,4 @@
-package by.senla.training.chaplinskiy.hotel.excel;
+package by.senla.training.chaplinskiy.hotel.stringreader;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

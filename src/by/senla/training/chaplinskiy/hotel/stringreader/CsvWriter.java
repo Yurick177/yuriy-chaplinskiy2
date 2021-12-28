@@ -1,4 +1,4 @@
-package by.senla.training.chaplinskiy.hotel.excel;
+package by.senla.training.chaplinskiy.hotel.stringreader;
 
 import java.io.FileWriter;
 import java.io.IOException;

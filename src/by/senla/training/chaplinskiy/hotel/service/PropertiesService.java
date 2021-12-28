@@ -1,6 +1,6 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
-import by.senla.training.chaplinskiy.hotel.excel.CsvReader;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvReader;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -17,10 +17,10 @@ public class PropertiesService {
         properties = new HashMap<>();
         try {
             List<String> linesFromFile = csvReader.getLinesFromFile("resources/hotel.properties");
-            for (String line : linesFromFile){
-                if(line!= null && line.length()>0){
+            for (String line : linesFromFile) {
+                if (line != null && line.length() > 0) {
                     String[] split = line.split("=");
-                    properties.put(split[0],split[1]);
+                    properties.put(split[0], split[1]);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -28,14 +28,14 @@ public class PropertiesService {
         }
     }
 
-    public static PropertiesService getPropertiesService(){
-        if(propertiesService == null){
+    public static PropertiesService getPropertiesService() {
+        if (propertiesService == null) {
             propertiesService = new PropertiesService();
         }
         return propertiesService;
     }
 
-    public String getValue(String key){
+    public String getValue(String key) {
         return properties.get(key);
     }
 

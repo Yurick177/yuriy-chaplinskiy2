@@ -1,9 +1,10 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
+import by.senla.training.chaplinskiy.hotel.entity.SupplyType;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 
 import java.util.List;
-import java.util.Scanner;
 
 public interface SupplyService {
 
@@ -13,13 +14,13 @@ public interface SupplyService {
 
     List<Supply> getAll();
 
-    Long addSupply(Scanner scanner);
+    Long addSupply(SupplyType supplyType1, int price);
 
-    void update(Scanner scanner);
+    void update(Long id, int price);
 
-    void remove(Scanner scanner);
+    void remove(Long id);
 
-    Supply getById(Scanner scanner);
+    Supply getById(Long id) throws EntityNotFoundException;
 
     void exportFile();
 

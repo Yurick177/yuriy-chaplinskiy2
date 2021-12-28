@@ -55,7 +55,7 @@ public class SupplyRepositoryImpl implements SupplyRepository {
     }
 
     public Supply getById(Long id) throws EntityNotFoundException {
-        return supplies.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(()-> new EntityNotFoundException("Услуги по такому id не найдено "));
+        return supplies.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(() -> new EntityNotFoundException("Услуги по такому id не найдено "));
     }
 
     public List<Supply> addAll(List<Supply> supplies) {

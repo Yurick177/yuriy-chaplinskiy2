@@ -27,7 +27,7 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     public Room getRoomById(Long id) throws EntityNotFoundException {
-        return rooms.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(()->new EntityNotFoundException("Комната по такому id не найдена"));
+        return rooms.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(() -> new EntityNotFoundException("Комната по такому id не найдена"));
     }
 
     public List<Room> addAll(List<Room> rooms) {

@@ -1,19 +1,19 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
+import by.senla.training.chaplinskiy.hotel.converter.PersonHistoryCsvConverter;
 import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
-import by.senla.training.chaplinskiy.hotel.excel.CsvWriter;
 import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
-import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvWriter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class PersonHistoryServiceImpl implements PersonHistoryService {
 
@@ -22,12 +22,15 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
     private final PersonRepository personRepository;
     private final CsvWriter csvWriter;
     private final PropertiesService propertiesService;
+    private final CsvConverter<PersonHistory> csvConverter;
+
 
     private PersonHistoryServiceImpl() {
         this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
         this.csvWriter = CsvWriter.getCsvWriter();
         this.propertiesService = PropertiesService.getPropertiesService();
+        this.csvConverter = PersonHistoryCsvConverter.getPersonHistoryCsvConverter();
     }
 
     public static PersonHistoryService getPersonHistoryService() {
@@ -38,9 +41,7 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
     }
 
     @Override
-    public List<PersonHistoryDto> getPersonHistoriesByRoomId(Scanner scanner) {
-        System.out.println("введите room id");
-        Long roomId = ScannerUtils.getLongFromConsole(scanner);
+    public List<PersonHistoryDto> getPersonHistoriesByRoomId(Long roomId) {
         List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(roomId);
         List<PersonHistoryDto> personHistoryDtos = new ArrayList<>();
         for (PersonHistory i : personHistoriesByRoomId) {
@@ -66,14 +67,10 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
 
     public void exportFile() {
         List<PersonHistory> personHistoryList = personHistoryRepository.getAll();
-        List<String> lines = new ArrayList<>();
-        lines.add("id,personId,releaseDate,checkInDate,roomId");
-        for (PersonHistory personHistory : personHistoryList) {
-            String line = personHistory.getId() + "," + personHistory.getPersonId() + "," + personHistory.getReleaseDate() + "," + personHistory.getCheckInDate() + "," + personHistory.getRoomId();
-            lines.add(line);
-        }
+        List<String> lines = csvConverter.getStrings(personHistoryList);
         csvWriter.writeLinesToFile(lines, propertiesService.getValue("personHistoryResultPath"));
     }
+
 
     public void addPersonHistory(PersonHistory personHistory) {
         List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(personHistory.getRoomId());
