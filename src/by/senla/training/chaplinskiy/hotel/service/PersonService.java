@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface PersonService {
 
-    Long createPerson(String name, String lastName, Integer age);
+    Long createPerson(String name, String lastName, int age);
 
     List<Person> sortAbs();
 

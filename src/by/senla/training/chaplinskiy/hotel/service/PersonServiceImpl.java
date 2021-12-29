@@ -49,7 +49,7 @@ public class PersonServiceImpl implements PersonService {
         return personService;
     }
 
-    public Long createPerson(String name, String lastName, Integer age) {
+    public Long createPerson(String name, String lastName, int age) {
         Person person = new Person(name, lastName, age);
         return personRepository.addPerson(person);
     }

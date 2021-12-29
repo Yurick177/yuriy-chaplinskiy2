@@ -480,7 +480,6 @@ public class Builder {
 
     }
 
-
     private MenuItem getPersonHistoryMenuItem() {
         MenuItem personHistoryMenuItem = new MenuItem();
         personHistoryMenuItem.setNextMenu(rootMenu);

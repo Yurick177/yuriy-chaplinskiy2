@@ -229,7 +229,6 @@ public class RoomServiceImpl implements RoomService {
         }
     }
 
-
     public void changeStatus(Long id, Status status) throws EntityNotFoundException {
         Room roomById = roomRepository.getRoomById(id);
         roomById.setStatus(status);

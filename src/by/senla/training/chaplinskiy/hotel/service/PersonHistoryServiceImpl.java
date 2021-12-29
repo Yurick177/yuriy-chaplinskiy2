@@ -24,7 +24,6 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
     private final PropertiesService propertiesService;
     private final CsvConverter<PersonHistory> csvConverter;
 
-
     private PersonHistoryServiceImpl() {
         this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
@@ -70,7 +69,6 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
         List<String> lines = csvConverter.getStrings(personHistoryList);
         csvWriter.writeLinesToFile(lines, propertiesService.getValue("personHistoryResultPath"));
     }
-
 
     public void addPersonHistory(PersonHistory personHistory) {
         List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(personHistory.getRoomId());

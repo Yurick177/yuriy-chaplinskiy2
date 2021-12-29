@@ -45,7 +45,6 @@ public class RoomController {
         System.out.println("введите вместимость");
         String capacityRoom = scanner.nextLine();
         return roomService.createRoom(status, Integer.parseInt(price), Long.parseLong(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
-
     }
 
     public List<Room> getRooms() {
