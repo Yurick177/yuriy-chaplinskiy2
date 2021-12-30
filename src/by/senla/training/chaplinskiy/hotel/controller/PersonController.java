@@ -2,14 +2,12 @@ package by.senla.training.chaplinskiy.hotel.controller;
 
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
+import by.senla.training.chaplinskiy.hotel.exception.ServiceException;
 import by.senla.training.chaplinskiy.hotel.service.PersonService;
 import by.senla.training.chaplinskiy.hotel.service.PersonServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Scanner;
-
-import static by.senla.training.chaplinskiy.hotel.utils.ScannerUtils.getDate;
 
 public class PersonController {
 
@@ -27,14 +25,14 @@ public class PersonController {
         return personController;
     }
 
-    public Long createPerson(Scanner scanner) {
-        System.out.println("введите имя");
-        String name = scanner.nextLine();
-        System.out.println("введите фамилию");
-        String lastName = scanner.nextLine();
-        System.out.println("введите возраст");
-        int age = Integer.parseInt(scanner.nextLine());
-        return personService.createPerson(name, lastName, age);
+    public String createPerson(String name, String lastName, String ageString) {
+        try {
+            int age = Integer.parseInt(ageString);
+            return String.valueOf(personService.createPerson(name, lastName, age));
+        } catch (NumberFormatException a) {
+            return "Ошибка !!! вы ввели не тот символ";
+        }
+
     }
 
     public List<Person> sortAbs() {
@@ -45,41 +43,36 @@ public class PersonController {
         return personService.getNumberGuests();
     }
 
-    public int getTotalPrice(Scanner scanner) {
-        System.out.println("введите Id клиента");
-        Long personId = Long.parseLong(scanner.nextLine());
+    public String getTotalPrice(String personIdString) {
         try {
-            return personService.getTotalPrice(personId);
+            Long personId = Long.parseLong(personIdString);
+            return String.valueOf(personService.getTotalPrice(personId));
         } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
-            return getTotalPrice(scanner);
+            return e.getMessage();
+        } catch (NumberFormatException a) {
+            return "Ошибка !!! вы ввели не тот символ";
         }
     }
 
-    public Long checkInPerson(Scanner scanner) {
-        System.out.println("введите id пользователя ");
-        Long id = Long.parseLong(scanner.nextLine());
-        LocalDateTime checkInDate = getDate(scanner, "введите год.месяц.день.часы.минуты заселения");
-        LocalDateTime releaseDate = getDate(scanner, "введите год.месяц.день.часы.минуты выселения");
+    public String checkInPerson(Long id, LocalDateTime checkInDate, LocalDateTime releaseDate) {
         try {
-            return personService.checkInPerson(id, checkInDate, releaseDate);
+            return String.valueOf(personService.checkInPerson(id, checkInDate, releaseDate));
         } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
-            return checkInPerson(scanner);
+            return e.getMessage();
         }
     }
 
-    public void checkOutPerson(Scanner scanner) {
-        System.out.println("введите id клиента ");
-        Long personId = Long.parseLong(scanner.nextLine());
-        System.out.println("введите id комнаты");
-        Long roomId = Long.parseLong(scanner.nextLine());
+    public String checkOutPerson(String personIdString, String roomIdString) {
         try {
+            Long personId = Long.parseLong(personIdString);
+            Long roomId = Long.parseLong(roomIdString);
             personService.checkOutPerson(personId, roomId);
-        } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
-            checkOutPerson(scanner);
+        } catch (EntityNotFoundException | ServiceException e) {
+            return e.getMessage();
+        } catch (NumberFormatException a) {
+            return "Ошибка !!! вы ввели не тот символ";
         }
+        return "Выселен из номера";
     }
 
     public void importFromFile() {

@@ -7,6 +7,7 @@ import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
 import by.senla.training.chaplinskiy.hotel.exception.CustomRuntimeException;
 import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
+import by.senla.training.chaplinskiy.hotel.exception.ServiceException;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
 import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
@@ -101,20 +102,14 @@ public class PersonServiceImpl implements PersonService {
         return null;
     }
 
-    public void checkOutPerson(Long personId, Long roomId) throws EntityNotFoundException {
+    public void checkOutPerson(Long personId, Long roomId) throws EntityNotFoundException, ServiceException {
         personRepository.getPersonById(personId);
-        try {
-
-            Room roomById = roomRepository.getRoomById(roomId);
-            Person person = roomById.getPerson();
-            if (person != null && person.getId().equals(personId)) {
-                roomService.removePerson(roomById);
-                System.out.println("выселен из комнаты");
-            } else {
-                System.out.println("в этой комнате человек не проживает");
-            }
-        } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
+        Room roomById = roomRepository.getRoomById(roomId);
+        Person person = roomById.getPerson();
+        if (person != null && person.getId().equals(personId)) {
+            roomService.removePerson(roomById);
+        } else {
+            throw new ServiceException("в этой комнате человек не проживает");
         }
     }
 

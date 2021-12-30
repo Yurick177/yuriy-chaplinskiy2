@@ -1,12 +1,12 @@
 package by.senla.training.chaplinskiy.hotel.controller;
 
 import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.service.PersonHistoryService;
 import by.senla.training.chaplinskiy.hotel.service.PersonHistoryServiceImpl;
-import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
 import java.util.List;
-import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class PersonHistoryController {
 
@@ -24,10 +24,15 @@ public class PersonHistoryController {
         return personHistoryController;
     }
 
-    public List<PersonHistoryDto> getPersonHistoriesByRoomId(Scanner scanner) {
-        System.out.println("введите room id");
-        Long roomId = ScannerUtils.getLongFromConsole(scanner);
-        return personHistoryService.getPersonHistoriesByRoomId(roomId);
+    public String getPersonHistoriesByRoomId(Long roomId) {
+        try {
+            List<PersonHistoryDto> personHistoriesByRoomId = personHistoryService.getPersonHistoriesByRoomId(roomId);
+            return personHistoriesByRoomId.stream()
+                    .map(i -> i.getPersonFirstName() + " " + i.getPersonLastName() + " " + i.getCheckInDate() + " " + i.getReleaseDate())
+                    .collect(Collectors.joining("\n"));
+        } catch (EntityNotFoundException e) {
+            return e.getMessage();
+        }
     }
 
     public void exportFile() {

@@ -4,14 +4,16 @@ import by.senla.training.chaplinskiy.hotel.controller.PersonController;
 import by.senla.training.chaplinskiy.hotel.controller.PersonHistoryController;
 import by.senla.training.chaplinskiy.hotel.controller.RoomController;
 import by.senla.training.chaplinskiy.hotel.controller.SupplyController;
-import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
-import by.senla.training.chaplinskiy.hotel.entity.Person;
-import by.senla.training.chaplinskiy.hotel.entity.Room;
-import by.senla.training.chaplinskiy.hotel.entity.Supply;
+import by.senla.training.chaplinskiy.hotel.entity.*;
 import by.senla.training.chaplinskiy.hotel.service.PropertiesService;
+import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+
+import static by.senla.training.chaplinskiy.hotel.utils.ScannerUtils.getDate;
 
 public class Builder {
 
@@ -105,26 +107,44 @@ public class Builder {
 
         MenuItem addSupplyItem = new MenuItem();
         addSupplyItem.setTitle(" 4 Add supply ");
-        IAction addSupply = () -> System.out.println(supplyController.addSupply(scan));
+        IAction addSupply = () -> {
+            System.out.println(" введите тип услуги " + Arrays.toString(SupplyType.values()));
+            String supplyType = scan.nextLine();
+            System.out.println(" введите цену ");
+            String price = scan.nextLine();
+            System.out.println(supplyController.addSupply(supplyType, price));
+        };
         addSupplyItem.setAction(addSupply);
         supplyMenu.getMenuItems().add(addSupplyItem);
 
         MenuItem updateSupplyItem = new MenuItem();
         updateSupplyItem.setTitle(" 5 Update supply ");
-        IAction updateSupply = () -> supplyController.update(scan);
+        IAction updateSupply = () -> {
+            System.out.println(" введите id услуги ");
+            Long id = ScannerUtils.getLongFromConsole(scan);
+            System.out.println(" введите новую цену ");
+            String price = scan.nextLine();
+            System.out.println(supplyController.update(id, price));
+        };
         updateSupplyItem.setAction(updateSupply);
         supplyMenu.getMenuItems().add(updateSupplyItem);
 
         MenuItem removeSupplyItem = new MenuItem();
         removeSupplyItem.setTitle(" 6 Remove supply ");
-        IAction removeSupply = () -> supplyController.remove(scan);
+        IAction removeSupply = () -> {
+            System.out.println(" введите id услуги, которую нужно удалить");
+            Long id = ScannerUtils.getLongFromConsole(scan);
+            supplyController.remove(id);
+        };
         removeSupplyItem.setAction(removeSupply);
         supplyMenu.getMenuItems().add(removeSupplyItem);
 
         MenuItem getByIdSupplyItem = new MenuItem();
         getByIdSupplyItem.setTitle(" 7 Show by id supply ");
         IAction getByIdSupply = () -> {
-            Supply supply = supplyController.getById(scan);
+            System.out.println(" введите id услуги ");
+            Long id = ScannerUtils.getLongFromConsole(scan);
+            Supply supply = supplyController.getById(id);
             if (supply != null) {
                 System.out.println(supply.getId() + " " + supply.getPrice() + " " + supply.getServiceType());
             }
@@ -165,8 +185,13 @@ public class Builder {
         MenuItem createPersonItem = new MenuItem();
         createPersonItem.setTitle(" 1 Create person ");
         IAction createPerson = () -> {
-            System.out.println("Create person");
-            Long id = personController.createPerson(scan);
+            System.out.println("введите имя");
+            String name = scan.nextLine();
+            System.out.println("введите фамилию");
+            String lastName = scan.nextLine();
+            System.out.println("введите возраст");
+            String age = scan.nextLine();
+            String id = personController.createPerson(name, lastName, age);
             System.out.println("Person id is " + id);
         };
         createPersonItem.setAction(createPerson);
@@ -175,7 +200,11 @@ public class Builder {
         MenuItem checkInPersonItem = new MenuItem();
         checkInPersonItem.setTitle(" 2 Check in person ");
         IAction checkInPerson = () -> {
-            Long roomId = personController.checkInPerson(scan);
+            System.out.println("введите id пользователя ");
+            Long id = Long.parseLong(scan.nextLine());
+            LocalDateTime checkInDate = getDate(scan, "введите год.месяц.день.часы.минуты заселения");
+            LocalDateTime releaseDate = getDate(scan, "введите год.месяц.день.часы.минуты выселения");
+            String roomId = personController.checkInPerson(id, checkInDate, releaseDate);
             if (roomId != null) {
                 System.out.println("человек заселен в комнату под номером " + roomId);
             } else {
@@ -187,7 +216,13 @@ public class Builder {
 
         MenuItem checkOutPersonItem = new MenuItem();
         checkOutPersonItem.setTitle(" 3 Check out person ");
-        IAction checkOutPerson = () -> personController.checkOutPerson(scan);
+        IAction checkOutPerson = () -> {
+            System.out.println("введите id клиента ");
+            String personId = scan.nextLine();
+            System.out.println("введите id комнаты");
+            String roomId = scan.nextLine();
+            System.out.println(personController.checkOutPerson(personId, roomId));
+        };
         checkOutPersonItem.setAction(checkOutPerson);
         personMenu.getMenuItems().add(checkOutPersonItem);
 
@@ -210,7 +245,11 @@ public class Builder {
 
         MenuItem getTotalPriceItem = new MenuItem();
         getTotalPriceItem.setTitle(" 6 Show total price ");
-        IAction getTotalPrice = () -> System.out.println(personController.getTotalPrice(scan));
+        IAction getTotalPrice = () -> {
+            System.out.println("введите Id клиента");
+            String personId = scan.nextLine();
+            System.out.println(personController.getTotalPrice(personId));
+        };
         getTotalPriceItem.setAction(getTotalPrice);
         personMenu.getMenuItems().add(getTotalPriceItem);
 
@@ -257,7 +296,22 @@ public class Builder {
 
         MenuItem addRoomItem = new MenuItem();
         addRoomItem.setTitle(" 2 Add room ");
-        IAction addRoom = () -> roomController.createRoom(scan);
+        IAction addRoom = () -> {
+            System.out.println("Введите статус комнаты");
+            for (Status status : Status.values()) {
+                System.out.println(status.name());
+            }
+            String statusString = scan.nextLine();
+            System.out.println("введите цену");
+            String price = scan.nextLine();
+            System.out.println("введите номер комнаты");
+            String id = scan.nextLine();
+            System.out.println("введите звезду");
+            String star = scan.nextLine();
+            System.out.println("введите вместимость");
+            String capacityRoom = scan.nextLine();
+            roomController.createRoom(statusString, price, id, star, capacityRoom);
+        };
         addRoomItem.setAction(addRoom);
         roomMenu.getMenuItems().add(addRoomItem);
 
@@ -330,10 +384,9 @@ public class Builder {
         MenuItem getPersonHistoryByRoomItem = new MenuItem();
         getPersonHistoryByRoomItem.setTitle(" 9 Show person history by room id ");
         IAction getPersonHistoryByRoomId = () -> {
-            List<PersonHistoryDto> personHistoriesByRoomId = personHistoryController.getPersonHistoriesByRoomId(scan);
-            for (PersonHistoryDto i : personHistoriesByRoomId) {
-                System.out.println(i.getPersonFirstName() + " " + i.getPersonLastName() + " " + i.getCheckInDate() + " " + i.getReleaseDate());
-            }
+            System.out.println("введите room id");
+            Long roomId = ScannerUtils.getLongFromConsole(scan);
+            System.out.println(personHistoryController.getPersonHistoriesByRoomId(roomId));
         };
         getPersonHistoryByRoomItem.setAction(getPersonHistoryByRoomId);
         roomMenu.getMenuItems().add(getPersonHistoryByRoomItem);
@@ -432,7 +485,13 @@ public class Builder {
 
         MenuItem getAvailableRoomsByDateItem = new MenuItem();
         getAvailableRoomsByDateItem.setTitle(" 18 Show available rooms by date ");
-        IAction getAvailableRoomsByDate = () -> roomController.getAvailableRoomsByDate(scan);
+        IAction getAvailableRoomsByDate = () -> {
+            LocalDateTime localDateTime = getDate(scan, "введите год.месяц.день.часы.минуты заселения");
+            List<Room> availableRoomsByDate = roomController.getAvailableRoomsByDate(localDateTime);
+            for (Room i : availableRoomsByDate) {
+                System.out.println("дата " + i.getCheckInDate() + "статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
+            }
+        };
         getAvailableRoomsByDateItem.setAction(getAvailableRoomsByDate);
         roomMenu.getMenuItems().add(getAvailableRoomsByDateItem);
 
@@ -447,7 +506,11 @@ public class Builder {
         IAction changeStatus = () -> {
             String changeStatusAvailable = propertiesService.getValue("changeStatusAvailable");
             if (changeStatusAvailable.equals("true")) {
-                roomController.changeStatus(scan);
+                System.out.println("введите id комнаты ");
+                Long id = ScannerUtils.getLongFromConsole(scan);
+                System.out.println("введите статус");
+                String status = scan.nextLine();
+                System.out.println(roomController.changeStatus(id, status));
             } else {
                 System.out.println("смена статуса запрещена !!!");
             }

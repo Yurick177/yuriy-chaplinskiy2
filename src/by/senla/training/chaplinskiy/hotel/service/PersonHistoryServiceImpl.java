@@ -40,7 +40,7 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
     }
 
     @Override
-    public List<PersonHistoryDto> getPersonHistoriesByRoomId(Long roomId) {
+    public List<PersonHistoryDto> getPersonHistoriesByRoomId(Long roomId) throws EntityNotFoundException {
         List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(roomId);
         List<PersonHistoryDto> personHistoryDtos = new ArrayList<>();
         for (PersonHistory i : personHistoriesByRoomId) {
@@ -50,15 +50,9 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
             personHistoryDto.setReleaseDate(i.getReleaseDate());
             personHistoryDto.setCheckInDate(i.getCheckInDate());
             personHistoryDto.setRoomId(i.getRoomId());
-
-            try {
-                Person person = personRepository.getPersonById(i.getPersonId());
-                personHistoryDto.setPersonFirstName(person.getName());
-                personHistoryDto.setPersonLastName(person.getLastName());
-
-            } catch (EntityNotFoundException e) {
-                System.out.println("Такого человека по Id " + i.getPersonId() + " не найден");
-            }
+            Person person = personRepository.getPersonById(i.getPersonId());
+            personHistoryDto.setPersonFirstName(person.getName());
+            personHistoryDto.setPersonLastName(person.getLastName());
             personHistoryDtos.add(personHistoryDto);
         }
         return personHistoryDtos;

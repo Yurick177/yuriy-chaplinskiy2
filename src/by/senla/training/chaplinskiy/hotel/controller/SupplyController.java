@@ -5,11 +5,8 @@ import by.senla.training.chaplinskiy.hotel.entity.SupplyType;
 import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.service.SupplyService;
 import by.senla.training.chaplinskiy.hotel.service.SupplyServiceImpl;
-import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 public class SupplyController {
 
@@ -39,50 +36,38 @@ public class SupplyController {
         return supplyService.getAll();
     }
 
-    public Long addSupply(Scanner scanner) {
-        System.out.println(" введите тип услуги " + Arrays.toString(SupplyType.values()));
-        String supplyType = scanner.nextLine();
-        SupplyType supplyType1 = null;
+    public String addSupply(String supplyType, String priceString) {
+        SupplyType supplyType1;
         try {
             supplyType1 = SupplyType.valueOf(supplyType);
         } catch (IllegalArgumentException e) {
-            System.out.println("Ошибка!!! вводите тип, как указанно");
-            addSupply(scanner);
+            return "Ошибка!!! вводите тип, как указанно";
         }
-        System.out.println(" введите цену ");
-        int price = 0;
+        int price;
         try {
-            price = Integer.parseInt(scanner.nextLine());
+            price = Integer.parseInt(priceString);
         } catch (NumberFormatException e) {
-            System.out.println("Ошибка!!! вы ввели цену не правильно, вводите только цифры");
-            addSupply(scanner);
+            return "Ошибка!!! вы ввели цену не правильно, вводите только цифры";
         }
-        return supplyService.addSupply(supplyType1, price);
+        return String.valueOf(supplyService.addSupply(supplyType1, price));
     }
 
-    public void update(Scanner scanner) {
-        System.out.println(" введите id услуги ");
-        Long id = ScannerUtils.getLongFromConsole(scanner);
-        System.out.println(" введите новую цену ");
-        int price = 0;
+    public String update(Long id, String priceString) {
+        int price;
         try {
-            price = Integer.parseInt(scanner.nextLine());
+            price = Integer.parseInt(priceString);
         } catch (NumberFormatException r) {
-            System.out.println("Ошибка!!! вводите только цифры");
-            update(scanner);
+            return "Ошибка!!! вводите только цифры";
         }
         supplyService.update(id, price);
+        return "обновлено";
     }
 
-    public void remove(Scanner scanner) {
-        System.out.println(" введите id услуги, которую нужно удалить");
-        Long id = ScannerUtils.getLongFromConsole(scanner);
+    public void remove(Long id) {
         supplyService.remove(id);
     }
 
-    public Supply getById(Scanner scanner) {
-        System.out.println(" введите id услуги ");
-        Long id = ScannerUtils.getLongFromConsole(scanner);
+    public Supply getById(Long id) {
         try {
             return supplyService.getById(id);
         } catch (EntityNotFoundException e) {

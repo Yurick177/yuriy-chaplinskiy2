@@ -5,13 +5,9 @@ import by.senla.training.chaplinskiy.hotel.entity.Status;
 import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.service.RoomService;
 import by.senla.training.chaplinskiy.hotel.service.RoomServiceImpl;
-import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Scanner;
-
-import static by.senla.training.chaplinskiy.hotel.utils.ScannerUtils.getDate;
 
 public class RoomController {
 
@@ -29,22 +25,13 @@ public class RoomController {
         return roomController;
     }
 
-    public Room createRoom(Scanner scanner) {
-        System.out.println("Введите статус комнаты");
-        for (Status status : Status.values()) {
-            System.out.println(status.name());
+    public void createRoom(String statusString, String price, String id, String star, String capacityRoom) {
+        try {
+            Status status = Status.valueOf(statusString);
+            roomService.createRoom(status, Integer.parseInt(price), Long.parseLong(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
+        } catch (IllegalArgumentException a) {
+            System.out.println("Ошибка !!! вы ввели не тот символ");
         }
-        String statusString = scanner.nextLine();
-        Status status = Status.valueOf(statusString);
-        System.out.println("введите цену");
-        String price = scanner.nextLine();
-        System.out.println("введите номер комнаты");
-        String id = scanner.nextLine();
-        System.out.println("введите звезду");
-        String star = scanner.nextLine();
-        System.out.println("введите вместимость");
-        String capacityRoom = scanner.nextLine();
-        return roomService.createRoom(status, Integer.parseInt(price), Long.parseLong(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
     }
 
     public List<Room> getRooms() {
@@ -119,8 +106,7 @@ public class RoomController {
         return roomService.getFreeNumbers();
     }
 
-    public List<Room> getAvailableRoomsByDate(Scanner scanner) {
-        LocalDateTime localDateTime = getDate(scanner, "введите год.месяц.день.часы.минуты заселения");
+    public List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime) {
         return roomService.getAvailableRoomsByDate(localDateTime);
     }
 
@@ -132,17 +118,16 @@ public class RoomController {
         roomService.importFromFile();
     }
 
-    public void changeStatus(Scanner scanner) {
-        System.out.println("введите id комнаты ");
-        Long id = ScannerUtils.getLongFromConsole(scanner);
-        System.out.println("введите статус");
-        Status status = Status.valueOf(scanner.nextLine());
+    public String changeStatus(Long id, String statusString) {
         try {
+            Status status = Status.valueOf(statusString);
             roomService.changeStatus(id, status);
         } catch (EntityNotFoundException e) {
-            System.out.println(e.getMessage());
-            changeStatus(scanner);
+            return e.getMessage();
+        } catch (IllegalArgumentException a) {
+            return "Ошибка !!! вы ввели не тот символ";
         }
+        return "Статус изменен";
     }
 
 }
