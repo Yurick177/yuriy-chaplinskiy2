@@ -1,5 +1,7 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
 import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
 import by.senla.training.chaplinskiy.hotel.converter.RoomCsvConverter;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
@@ -29,21 +31,24 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final CsvWriter csvWriter;
     private final CsvReader csvReader;
-    private final PropertiesService propertiesService;
     private final CsvConverter<Room> csvConverter;
+    @ConfigProperty(key = "roomResultPath")
+    private String roomResultPath;
+    @ConfigProperty(key = "roomPath")
+    private String roomPath;
 
     private RoomServiceImpl() {
         this.roomRepository = RoomRepositoryImpl.getRoomRepository();
         this.personHistoryService = PersonHistoryServiceImpl.getPersonHistoryService();
         this.csvWriter = CsvWriter.getCsvWriter();
         this.csvReader = CsvReader.getCsvReader();
-        this.propertiesService = PropertiesService.getPropertiesService();
         this.csvConverter = RoomCsvConverter.getRoomCsvConverter();
     }
 
     public static RoomService getRoomService() {
         if (roomService == null) {
             roomService = new RoomServiceImpl();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(roomService);
         }
         return roomService;
     }
@@ -216,12 +221,12 @@ public class RoomServiceImpl implements RoomService {
     public void exportFile() {
         List<Room> roomList = roomService.getRooms();
         List<String> lines = csvConverter.getStrings(roomList);
-        csvWriter.writeLinesToFile(lines, propertiesService.getValue("roomResultPath"));
+        csvWriter.writeLinesToFile(lines, roomResultPath);
     }
 
     public void importFromFile() {
         try {
-            List<String> lineFromString = csvReader.getLinesFromFile(propertiesService.getValue("roomPath"));
+            List<String> lineFromString = csvReader.getLinesFromFile(roomPath);
             List<Room> roomList = csvConverter.getFromStrings(lineFromString);
             roomRepository.addAll(roomList);
         } catch (FileNotFoundException e) {

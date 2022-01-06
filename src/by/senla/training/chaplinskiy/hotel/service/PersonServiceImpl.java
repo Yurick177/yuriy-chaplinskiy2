@@ -1,5 +1,7 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
 import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
 import by.senla.training.chaplinskiy.hotel.converter.PersonCsvConverter;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
@@ -30,8 +32,12 @@ public class PersonServiceImpl implements PersonService {
     private final RoomService roomService;
     private final CsvReader csvReader;
     private final CsvWriter csvWriter;
-    private final PropertiesService propertiesService;
     private final CsvConverter<Person> csvConverter;
+    @ConfigProperty(key = "personResultPath")
+    private String personResultPath;
+    @ConfigProperty(key = "personPath")
+    private String personPath;
+
 
     public PersonServiceImpl() {
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
@@ -39,13 +45,13 @@ public class PersonServiceImpl implements PersonService {
         this.roomService = RoomServiceImpl.getRoomService();
         this.csvReader = CsvReader.getCsvReader();
         this.csvWriter = CsvWriter.getCsvWriter();
-        this.propertiesService = PropertiesService.getPropertiesService();
         this.csvConverter = PersonCsvConverter.getPersonCsvConverter();
     }
 
     public static PersonService getPersonService() {
         if (personService == null) {
             personService = new PersonServiceImpl();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(personService);
         }
         return personService;
     }
@@ -116,7 +122,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public void importFromFile() {
         try {
-            List<String> linesFromFile = csvReader.getLinesFromFile(propertiesService.getValue("personPath"));
+            List<String> linesFromFile = csvReader.getLinesFromFile(personPath);
             List<Person> personList = csvConverter.getFromStrings(linesFromFile);
             personRepository.addAllPerson(personList);
         } catch (FileNotFoundException e) {
@@ -127,7 +133,7 @@ public class PersonServiceImpl implements PersonService {
     public void exportFile() {
         List<Person> personList = personRepository.getPersons();
         List<String> lines = csvConverter.getStrings(personList);
-        csvWriter.writeLinesToFile(lines, propertiesService.getValue("personResultPath"));
+        csvWriter.writeLinesToFile(lines, personResultPath);
     }
 
 }

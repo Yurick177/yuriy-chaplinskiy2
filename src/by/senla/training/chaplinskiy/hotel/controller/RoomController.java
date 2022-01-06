@@ -25,13 +25,8 @@ public class RoomController {
         return roomController;
     }
 
-    public void createRoom(String statusString, String price, String id, String star, String capacityRoom) {
-        try {
-            Status status = Status.valueOf(statusString);
-            roomService.createRoom(status, Integer.parseInt(price), Long.parseLong(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
-        } catch (IllegalArgumentException a) {
-            System.out.println("Ошибка !!! вы ввели не тот символ");
-        }
+    public void createRoom(Status status, int price, Long id, int star, int capacityRoom) {
+        roomService.createRoom(status, price, id, star, capacityRoom);
     }
 
     public List<Room> getRooms() {
@@ -118,14 +113,11 @@ public class RoomController {
         roomService.importFromFile();
     }
 
-    public String changeStatus(Long id, String statusString) {
+    public String changeStatus(Long id, Status status) {
         try {
-            Status status = Status.valueOf(statusString);
             roomService.changeStatus(id, status);
         } catch (EntityNotFoundException e) {
             return e.getMessage();
-        } catch (IllegalArgumentException a) {
-            return "Ошибка !!! вы ввели не тот символ";
         }
         return "Статус изменен";
     }

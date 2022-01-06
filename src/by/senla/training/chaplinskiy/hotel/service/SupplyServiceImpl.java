@@ -1,5 +1,7 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
 import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
 import by.senla.training.chaplinskiy.hotel.converter.SupplyCsvConverter;
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
@@ -21,20 +23,23 @@ public class SupplyServiceImpl implements SupplyService {
     private final SupplyRepository supplyRepository;
     private final CsvWriter csvWriter;
     private final CsvReader csvReader;
-    private final PropertiesService propertiesService;
     private final CsvConverter<Supply> csvConverter;
+    @ConfigProperty(key = "supplyPath")
+    private String supplyPath;
+    @ConfigProperty(key = "supplyResultPath")
+    private String supplyResultPath;
 
     private SupplyServiceImpl() {
         this.supplyRepository = SupplyRepositoryImpl.getSupplyRepository();
         this.csvWriter = CsvWriter.getCsvWriter();
         this.csvReader = CsvReader.getCsvReader();
-        this.propertiesService = PropertiesService.getPropertiesService();
         this.csvConverter = SupplyCsvConverter.getSupplyCsvConverter();
     }
 
     public static SupplyServiceImpl getSupplyService() {
         if (supplyService == null) {
             supplyService = new SupplyServiceImpl();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(supplyService);
         }
         return supplyService;
     }
@@ -80,12 +85,12 @@ public class SupplyServiceImpl implements SupplyService {
     public void exportFile() {
         List<Supply> supplyList = supplyService.getAll();
         List<String> lines = csvConverter.getStrings(supplyList);
-        csvWriter.writeLinesToFile(lines, propertiesService.getValue("supplyResultPath"));
+        csvWriter.writeLinesToFile(lines, supplyResultPath);
     }
 
     public void importFromFile() {
         try {
-            List<String> lineFromString = csvReader.getLinesFromFile(propertiesService.getValue("supplyPath"));
+            List<String> lineFromString = csvReader.getLinesFromFile(supplyPath);
             List<Supply> supplyList = csvConverter.getFromStrings(lineFromString);
             supplyRepository.addAll(supplyList);
         } catch (FileNotFoundException e) {

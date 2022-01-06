@@ -25,14 +25,8 @@ public class PersonController {
         return personController;
     }
 
-    public String createPerson(String name, String lastName, String ageString) {
-        try {
-            int age = Integer.parseInt(ageString);
-            return String.valueOf(personService.createPerson(name, lastName, age));
-        } catch (NumberFormatException a) {
-            return "Ошибка !!! вы ввели не тот символ";
-        }
-
+    public String createPerson(String name, String lastName, int age) {
+        return String.valueOf(personService.createPerson(name, lastName, age));
     }
 
     public List<Person> sortAbs() {
@@ -43,14 +37,11 @@ public class PersonController {
         return personService.getNumberGuests();
     }
 
-    public String getTotalPrice(String personIdString) {
+    public String getTotalPrice(Long personId) {
         try {
-            Long personId = Long.parseLong(personIdString);
             return String.valueOf(personService.getTotalPrice(personId));
         } catch (EntityNotFoundException e) {
             return e.getMessage();
-        } catch (NumberFormatException a) {
-            return "Ошибка !!! вы ввели не тот символ";
         }
     }
 
@@ -62,15 +53,11 @@ public class PersonController {
         }
     }
 
-    public String checkOutPerson(String personIdString, String roomIdString) {
+    public String checkOutPerson(Long personId, Long roomId) {
         try {
-            Long personId = Long.parseLong(personIdString);
-            Long roomId = Long.parseLong(roomIdString);
             personService.checkOutPerson(personId, roomId);
         } catch (EntityNotFoundException | ServiceException e) {
             return e.getMessage();
-        } catch (NumberFormatException a) {
-            return "Ошибка !!! вы ввели не тот символ";
         }
         return "Выселен из номера";
     }

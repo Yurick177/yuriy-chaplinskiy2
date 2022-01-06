@@ -1,5 +1,7 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
 import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
 import by.senla.training.chaplinskiy.hotel.converter.PersonHistoryCsvConverter;
 import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
@@ -21,20 +23,23 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
     private final PersonHistoryRepository personHistoryRepository;
     private final PersonRepository personRepository;
     private final CsvWriter csvWriter;
-    private final PropertiesService propertiesService;
     private final CsvConverter<PersonHistory> csvConverter;
+    @ConfigProperty(key = "personHistoryResultPath")
+    private String personHistoryResultPath;
+    @ConfigProperty(key = "personHistorySize")
+    private String personHistorySize;
 
     private PersonHistoryServiceImpl() {
         this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
         this.csvWriter = CsvWriter.getCsvWriter();
-        this.propertiesService = PropertiesService.getPropertiesService();
         this.csvConverter = PersonHistoryCsvConverter.getPersonHistoryCsvConverter();
     }
 
     public static PersonHistoryService getPersonHistoryService() {
         if (personHistoryService == null) {
             personHistoryService = new PersonHistoryServiceImpl();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(personHistoryService);
         }
         return personHistoryService;
     }
@@ -61,12 +66,11 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
     public void exportFile() {
         List<PersonHistory> personHistoryList = personHistoryRepository.getAll();
         List<String> lines = csvConverter.getStrings(personHistoryList);
-        csvWriter.writeLinesToFile(lines, propertiesService.getValue("personHistoryResultPath"));
+        csvWriter.writeLinesToFile(lines, personHistoryResultPath);
     }
 
     public void addPersonHistory(PersonHistory personHistory) {
         List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(personHistory.getRoomId());
-        String personHistorySize = propertiesService.getValue("personHistorySize");
         int size = Integer.parseInt(personHistorySize);
         if (personHistoriesByRoomId.size() >= size) {
             long id = personHistoriesByRoomId.stream().mapToLong(PersonHistory::getId).min().orElse(0);

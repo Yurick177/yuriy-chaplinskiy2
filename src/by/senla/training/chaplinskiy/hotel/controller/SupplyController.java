@@ -36,29 +36,11 @@ public class SupplyController {
         return supplyService.getAll();
     }
 
-    public String addSupply(String supplyType, String priceString) {
-        SupplyType supplyType1;
-        try {
-            supplyType1 = SupplyType.valueOf(supplyType);
-        } catch (IllegalArgumentException e) {
-            return "Ошибка!!! вводите тип, как указанно";
-        }
-        int price;
-        try {
-            price = Integer.parseInt(priceString);
-        } catch (NumberFormatException e) {
-            return "Ошибка!!! вы ввели цену не правильно, вводите только цифры";
-        }
-        return String.valueOf(supplyService.addSupply(supplyType1, price));
+    public String addSupply(SupplyType supplyType, int price) {
+        return String.valueOf(supplyService.addSupply(supplyType, price));
     }
 
-    public String update(Long id, String priceString) {
-        int price;
-        try {
-            price = Integer.parseInt(priceString);
-        } catch (NumberFormatException r) {
-            return "Ошибка!!! вводите только цифры";
-        }
+    public String update(Long id, int price) {
         supplyService.update(id, price);
         return "обновлено";
     }

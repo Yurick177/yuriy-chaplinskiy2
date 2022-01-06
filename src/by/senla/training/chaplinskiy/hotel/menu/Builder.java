@@ -1,11 +1,12 @@
 package by.senla.training.chaplinskiy.hotel.menu;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
 import by.senla.training.chaplinskiy.hotel.controller.PersonController;
 import by.senla.training.chaplinskiy.hotel.controller.PersonHistoryController;
 import by.senla.training.chaplinskiy.hotel.controller.RoomController;
 import by.senla.training.chaplinskiy.hotel.controller.SupplyController;
 import by.senla.training.chaplinskiy.hotel.entity.*;
-import by.senla.training.chaplinskiy.hotel.service.PropertiesService;
 import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
 import java.time.LocalDateTime;
@@ -18,15 +19,16 @@ import static by.senla.training.chaplinskiy.hotel.utils.ScannerUtils.getDate;
 public class Builder {
 
     private static Builder builder;
-    private final PropertiesService propertiesService;
+    @ConfigProperty(key = "changeStatusAvailable")
+    private String changeStatusAvailable;
 
     private Builder() {
-        this.propertiesService = PropertiesService.getPropertiesService();
     }
 
     public static Builder getBuilder() {
         if (builder == null) {
             builder = new Builder();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(builder);
         }
         return builder;
     }
@@ -111,8 +113,16 @@ public class Builder {
             System.out.println(" введите тип услуги " + Arrays.toString(SupplyType.values()));
             String supplyType = scan.nextLine();
             System.out.println(" введите цену ");
-            String price = scan.nextLine();
-            System.out.println(supplyController.addSupply(supplyType, price));
+            String priceString = scan.nextLine();
+            try {
+                SupplyType supplyType1 = SupplyType.valueOf(supplyType);
+                int price = Integer.parseInt(priceString);
+                System.out.println(supplyController.addSupply(supplyType1, price));
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка!!! вы ввели цену не правильно, вводите только цифры");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка!!! вводите тип, как указанно");
+            }
         };
         addSupplyItem.setAction(addSupply);
         supplyMenu.getMenuItems().add(addSupplyItem);
@@ -123,8 +133,13 @@ public class Builder {
             System.out.println(" введите id услуги ");
             Long id = ScannerUtils.getLongFromConsole(scan);
             System.out.println(" введите новую цену ");
-            String price = scan.nextLine();
-            System.out.println(supplyController.update(id, price));
+            String priceString = scan.nextLine();
+            try {
+                int price = Integer.parseInt(priceString);
+                System.out.println(supplyController.update(id, price));
+            } catch (NumberFormatException r) {
+                System.out.println("Ошибка!!! вводите только цифры");
+            }
         };
         updateSupplyItem.setAction(updateSupply);
         supplyMenu.getMenuItems().add(updateSupplyItem);
@@ -190,9 +205,14 @@ public class Builder {
             System.out.println("введите фамилию");
             String lastName = scan.nextLine();
             System.out.println("введите возраст");
-            String age = scan.nextLine();
-            String id = personController.createPerson(name, lastName, age);
-            System.out.println("Person id is " + id);
+            String ageString = scan.nextLine();
+            try {
+                int age = Integer.parseInt(ageString);
+                String id = personController.createPerson(name, lastName, age);
+                System.out.println("Person id is " + id);
+            } catch (NumberFormatException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
         };
         createPersonItem.setAction(createPerson);
         personMenu.getMenuItems().add(createPersonItem);
@@ -218,10 +238,16 @@ public class Builder {
         checkOutPersonItem.setTitle(" 3 Check out person ");
         IAction checkOutPerson = () -> {
             System.out.println("введите id клиента ");
-            String personId = scan.nextLine();
+            String personIdString = scan.nextLine();
             System.out.println("введите id комнаты");
-            String roomId = scan.nextLine();
-            System.out.println(personController.checkOutPerson(personId, roomId));
+            String roomIdString = scan.nextLine();
+            try {
+                Long personId = Long.parseLong(personIdString);
+                Long roomId = Long.parseLong(roomIdString);
+                System.out.println(personController.checkOutPerson(personId, roomId));
+            } catch (NumberFormatException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
         };
         checkOutPersonItem.setAction(checkOutPerson);
         personMenu.getMenuItems().add(checkOutPersonItem);
@@ -247,8 +273,13 @@ public class Builder {
         getTotalPriceItem.setTitle(" 6 Show total price ");
         IAction getTotalPrice = () -> {
             System.out.println("введите Id клиента");
-            String personId = scan.nextLine();
-            System.out.println(personController.getTotalPrice(personId));
+            String personIdString = scan.nextLine();
+            try {
+                Long personId = Long.parseLong(personIdString);
+                System.out.println(personController.getTotalPrice(personId));
+            } catch (NumberFormatException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
         };
         getTotalPriceItem.setAction(getTotalPrice);
         personMenu.getMenuItems().add(getTotalPriceItem);
@@ -310,7 +341,12 @@ public class Builder {
             String star = scan.nextLine();
             System.out.println("введите вместимость");
             String capacityRoom = scan.nextLine();
-            roomController.createRoom(statusString, price, id, star, capacityRoom);
+            try {
+                Status status = Status.valueOf(statusString);
+                roomController.createRoom(status, Integer.parseInt(price), Long.parseLong(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
+            } catch (IllegalArgumentException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
         };
         addRoomItem.setAction(addRoom);
         roomMenu.getMenuItems().add(addRoomItem);
@@ -504,13 +540,17 @@ public class Builder {
         MenuItem changeStatusItem = new MenuItem();
         changeStatusItem.setTitle(" 20 changeStatus");
         IAction changeStatus = () -> {
-            String changeStatusAvailable = propertiesService.getValue("changeStatusAvailable");
             if (changeStatusAvailable.equals("true")) {
                 System.out.println("введите id комнаты ");
                 Long id = ScannerUtils.getLongFromConsole(scan);
                 System.out.println("введите статус");
-                String status = scan.nextLine();
-                System.out.println(roomController.changeStatus(id, status));
+                String statusString = scan.nextLine();
+                try {
+                    Status status = Status.valueOf(statusString);
+                    System.out.println(roomController.changeStatus(id, status));
+                } catch (IllegalArgumentException a) {
+                    System.out.println("Ошибка !!! вы ввели не тот символ");
+                }
             } else {
                 System.out.println("смена статуса запрещена !!!");
             }
