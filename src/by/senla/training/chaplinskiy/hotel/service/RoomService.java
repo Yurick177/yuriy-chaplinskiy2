@@ -1,18 +1,18 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
 import by.senla.training.chaplinskiy.hotel.entity.Person;
-import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
+import by.senla.training.chaplinskiy.hotel.entity.Status;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Scanner;
 
 public interface RoomService {
 
     void addPerson(Room room, Person person, LocalDateTime checkInDate, LocalDateTime releaseDate);
 
-    Room createRoom(Scanner scanner);
+    Room createRoom(Status status, int parseInt, long parseLong, int parseInt1, int parseInt2);
 
     List<Room> getRooms();
 
@@ -50,10 +50,14 @@ public interface RoomService {
 
     int getFreeNumbers();
 
-    List<Room> getAvailableRoomsByDate(Scanner scanner);
+    List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime);
 
     void removePerson(Room room);
 
-    List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner);
+    void exportFile();
+
+    void importFromFile();
+
+    void changeStatus(Long id, Status status) throws EntityNotFoundException;
 
 }

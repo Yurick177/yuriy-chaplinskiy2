@@ -6,7 +6,6 @@ public class Supply {
     private final SupplyType serviceType;
     private int price;
 
-
     public Supply(SupplyType serviceType, int price) {
         this.serviceType = serviceType;
         this.price = price;
@@ -28,7 +27,8 @@ public class Supply {
         this.price = price;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
+
 }

@@ -1,42 +1,52 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
+import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
+import by.senla.training.chaplinskiy.hotel.converter.SupplyCsvConverter;
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
 import by.senla.training.chaplinskiy.hotel.entity.SupplyType;
-import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
-import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.exception.CustomRuntimeException;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepository;
 import by.senla.training.chaplinskiy.hotel.repository.SupplyRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvReader;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvWriter;
 
-import java.util.Arrays;
+import java.io.FileNotFoundException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 
 public class SupplyServiceImpl implements SupplyService {
 
     private static SupplyServiceImpl supplyService = null;
     private final SupplyRepository supplyRepository;
-    private final RoomRepository roomRepository;
+    private final CsvWriter csvWriter;
+    private final CsvReader csvReader;
+    private final CsvConverter<Supply> csvConverter;
+    @ConfigProperty(key = "supplyPath")
+    private String supplyPath;
+    @ConfigProperty(key = "supplyResultPath")
+    private String supplyResultPath;
 
     private SupplyServiceImpl() {
         this.supplyRepository = SupplyRepositoryImpl.getSupplyRepository();
-        this.roomRepository = RoomRepositoryImpl.getRoomRepository();
+        this.csvWriter = CsvWriter.getCsvWriter();
+        this.csvReader = CsvReader.getCsvReader();
+        this.csvConverter = SupplyCsvConverter.getSupplyCsvConverter();
     }
 
     public static SupplyServiceImpl getSupplyService() {
         if (supplyService == null) {
             supplyService = new SupplyServiceImpl();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(supplyService);
         }
         return supplyService;
     }
 
-    public List<Supply> getSupplies() {
-        return supplyRepository.getSupplies();
-    }
-
     public List<Supply> getSuppliesSortedByPrice() {
         List<Supply> supplies = supplyRepository.getSupplies();
-        Comparator<Supply> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
+        Comparator<Supply> comparator = Comparator.comparing(Supply::getPrice);
         supplies.sort(comparator);
         return supplies;
     }
@@ -52,37 +62,40 @@ public class SupplyServiceImpl implements SupplyService {
         return supplyRepository.getAll();
     }
 
-    public Long addSupply(Scanner scanner) {
-        System.out.println(" введите тип услуги " + Arrays.toString(SupplyType.values()));
-        String supplyType = scanner.nextLine();
-        SupplyType supplyType1 = SupplyType.valueOf(supplyType);
-        System.out.println(" введите цену ");
-        int price = Integer.parseInt(scanner.nextLine());
+    public Long addSupply(SupplyType supplyType1, int price) {
         Supply supply = new Supply(supplyType1, price);
-        Long id = supplyRepository.addSupply(supply);
-        return id;
+        return supplyRepository.addSupply(supply);
     }
 
-    public void update(Scanner scanner) {
-        System.out.println(" введите id услуги ");
-        Long id = Long.parseLong(scanner.nextLine());
-        System.out.println(" введите новую цену ");
-        int price = Integer.parseInt(scanner.nextLine());
+    public void update(Long id, int price) {
         Supply supply = new Supply(null, price);
         supply.setId(id);
         supplyRepository.update(supply);
     }
 
-    public void remove(Scanner scanner) {
-        System.out.println(" введите id услуги, которую нужно удалить");
-        Long id = Long.parseLong(scanner.nextLine());
+    public void remove(Long id) {
+
         supplyRepository.remove(id);
     }
 
-    public Supply getById(Scanner scanner) {
-        System.out.println(" введите id услуги ");
-        Long id = Long.parseLong(scanner.nextLine());
+    public Supply getById(Long id) throws EntityNotFoundException {
         return supplyRepository.getById(id);
+    }
+
+    public void exportFile() {
+        List<Supply> supplyList = supplyService.getAll();
+        List<String> lines = csvConverter.getStrings(supplyList);
+        csvWriter.writeLinesToFile(lines, supplyResultPath);
+    }
+
+    public void importFromFile() {
+        try {
+            List<String> lineFromString = csvReader.getLinesFromFile(supplyPath);
+            List<Supply> supplyList = csvConverter.getFromStrings(lineFromString);
+            supplyRepository.addAll(supplyList);
+        } catch (FileNotFoundException e) {
+            throw new CustomRuntimeException("Не правильный путь к файлу");
+        }
     }
 
 }

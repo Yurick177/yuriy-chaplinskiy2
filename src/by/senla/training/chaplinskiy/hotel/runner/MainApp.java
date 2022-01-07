@@ -5,9 +5,7 @@ import by.senla.training.chaplinskiy.hotel.menu.MenuController;
 public class MainApp {
 
     public static void main(String[] args) {
-
-        MenuController menuController = new MenuController();
-        menuController.run();
+        MenuController.getMenuController().run();
     }
 
 }

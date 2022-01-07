@@ -1,23 +1,43 @@
 package by.senla.training.chaplinskiy.hotel.menu;
 
-import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
-import by.senla.training.chaplinskiy.hotel.entity.Person;
-import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
-import by.senla.training.chaplinskiy.hotel.entity.Room;
-import by.senla.training.chaplinskiy.hotel.entity.Supply;
-import by.senla.training.chaplinskiy.hotel.service.*;
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
+import by.senla.training.chaplinskiy.hotel.controller.PersonController;
+import by.senla.training.chaplinskiy.hotel.controller.PersonHistoryController;
+import by.senla.training.chaplinskiy.hotel.controller.RoomController;
+import by.senla.training.chaplinskiy.hotel.controller.SupplyController;
+import by.senla.training.chaplinskiy.hotel.entity.*;
+import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import static by.senla.training.chaplinskiy.hotel.utils.ScannerUtils.getDate;
+
 public class Builder {
 
+    private static Builder builder;
+    @ConfigProperty(key = "changeStatusAvailable")
+    private String changeStatusAvailable;
+
+    private Builder() {
+    }
+
+    public static Builder getBuilder() {
+        if (builder == null) {
+            builder = new Builder();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(builder);
+        }
+        return builder;
+    }
+
     private Menu rootMenu = new Menu();
-    private Menu menu;
-    private final RoomService roomService = RoomServiceImpl.getRoomService();
-    private final PersonService personService = PersonServiceImpl.getPersonService();
-    private final SupplyService supplyService = SupplyServiceImpl.getSupplyService();
-    private final PersonHistoryService personHistoryService = PersonHistoryServiceImpl.getPersonHistoryService();
+    private final RoomController roomController = RoomController.getRoomController();
+    private final PersonController personController = PersonController.getPersonController();
+    private final SupplyController supplyController = SupplyController.getSupplyController();
+    private final PersonHistoryController personHistoryController = PersonHistoryController.getPersonHistoryController();
     private final Scanner scan = new Scanner(System.in);
 
     public Menu getRootMenu() {
@@ -27,15 +47,26 @@ public class Builder {
     public void buildMenu() {
 
         MenuItem roomMenuItem = getRoomMenuItem();
+        roomMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(roomMenuItem);
 
         MenuItem personMenuItem = getPersonMenuItem();
+        personMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(personMenuItem);
 
         MenuItem supplyMenuItem = getSupplyMenuItem();
+        supplyMenuItem.setNextMenu(rootMenu);
         rootMenu.getMenuItems().add(supplyMenuItem);
 
-        menu = rootMenu;
+        MenuItem personHistoryMenuItem = getPersonHistoryMenuItem();
+        personHistoryMenuItem.setNextMenu(rootMenu);
+        rootMenu.getMenuItems().add(personHistoryMenuItem);
+
+        MenuItem exitMenuItem = new MenuItem();
+        exitMenuItem.setTitle("5 Exit ");
+        IAction exitMenu = () -> rootMenu = null;
+        exitMenuItem.setAction(exitMenu);
+        rootMenu.getMenuItems().add(exitMenuItem);
     }
 
     private MenuItem getSupplyMenuItem() {
@@ -46,7 +77,7 @@ public class Builder {
         MenuItem getSuppliesSortedByPriceItem = new MenuItem();
         getSuppliesSortedByPriceItem.setTitle(" 1 Show supplies sorted by price ");
         IAction getSuppliesSortedByPrice = () -> {
-            List<Supply> supply = supplyService.getSuppliesSortedByPrice();
+            List<Supply> supply = supplyController.getSuppliesSortedByPrice();
             for (Supply i : supply) {
                 System.out.println("цена " + i.getPrice());
             }
@@ -57,7 +88,7 @@ public class Builder {
         MenuItem getSuppliesSortedByTypeItem = new MenuItem();
         getSuppliesSortedByTypeItem.setTitle(" 2 Show supplies sorted by type ");
         IAction getSuppliesSortedByType = () -> {
-            List<Supply> supply = supplyService.getSuppliesSortedByType();
+            List<Supply> supply = supplyController.getSuppliesSortedByType();
             for (Supply i : supply) {
                 System.out.println("тип " + i.getServiceType());
             }
@@ -68,7 +99,7 @@ public class Builder {
         MenuItem getAllSupplyItem = new MenuItem();
         getAllSupplyItem.setTitle(" 3 Show all supply ");
         IAction getAllSupply = () -> {
-            List<Supply> supplies = supplyService.getAll();
+            List<Supply> supplies = supplyController.getAll();
             for (Supply i : supplies) {
                 System.out.println("id " + i.getId() + " цена " + i.getPrice() + " тип " + i.getServiceType());
             }
@@ -78,39 +109,80 @@ public class Builder {
 
         MenuItem addSupplyItem = new MenuItem();
         addSupplyItem.setTitle(" 4 Add supply ");
-        IAction addSupply = () -> System.out.println(supplyService.addSupply(scan));
+        IAction addSupply = () -> {
+            System.out.println(" введите тип услуги " + Arrays.toString(SupplyType.values()));
+            String supplyType = scan.nextLine();
+            System.out.println(" введите цену ");
+            String priceString = scan.nextLine();
+            try {
+                SupplyType supplyType1 = SupplyType.valueOf(supplyType);
+                int price = Integer.parseInt(priceString);
+                System.out.println(supplyController.addSupply(supplyType1, price));
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка!!! вы ввели цену не правильно, вводите только цифры");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка!!! вводите тип, как указанно");
+            }
+        };
         addSupplyItem.setAction(addSupply);
         supplyMenu.getMenuItems().add(addSupplyItem);
 
         MenuItem updateSupplyItem = new MenuItem();
         updateSupplyItem.setTitle(" 5 Update supply ");
-        IAction updateSupply = () -> supplyService.update(scan);
+        IAction updateSupply = () -> {
+            System.out.println(" введите id услуги ");
+            Long id = ScannerUtils.getLongFromConsole(scan);
+            System.out.println(" введите новую цену ");
+            String priceString = scan.nextLine();
+            try {
+                int price = Integer.parseInt(priceString);
+                System.out.println(supplyController.update(id, price));
+            } catch (NumberFormatException r) {
+                System.out.println("Ошибка!!! вводите только цифры");
+            }
+        };
         updateSupplyItem.setAction(updateSupply);
         supplyMenu.getMenuItems().add(updateSupplyItem);
 
         MenuItem removeSupplyItem = new MenuItem();
         removeSupplyItem.setTitle(" 6 Remove supply ");
-        IAction removeSupply = () -> supplyService.remove(scan);
+        IAction removeSupply = () -> {
+            System.out.println(" введите id услуги, которую нужно удалить");
+            Long id = ScannerUtils.getLongFromConsole(scan);
+            supplyController.remove(id);
+        };
         removeSupplyItem.setAction(removeSupply);
         supplyMenu.getMenuItems().add(removeSupplyItem);
 
         MenuItem getByIdSupplyItem = new MenuItem();
         getByIdSupplyItem.setTitle(" 7 Show by id supply ");
         IAction getByIdSupply = () -> {
-            Supply supply = supplyService.getById(scan);
+            System.out.println(" введите id услуги ");
+            Long id = ScannerUtils.getLongFromConsole(scan);
+            Supply supply = supplyController.getById(id);
             if (supply != null) {
                 System.out.println(supply.getId() + " " + supply.getPrice() + " " + supply.getServiceType());
-            } else {
-                System.out.println("услугу по такому id не нашли");
             }
         };
         getByIdSupplyItem.setAction(getByIdSupply);
         supplyMenu.getMenuItems().add(getByIdSupplyItem);
 
+        MenuItem exportFileItem = new MenuItem();
+        exportFileItem.setTitle(" 8 exportFile ");
+        IAction exportFile = supplyController::exportFile;
+        exportFileItem.setAction(exportFile);
+        supplyMenu.getMenuItems().add(exportFileItem);
+
+        MenuItem importFromFileItem = new MenuItem();
+        importFromFileItem.setTitle(" 9 importFromFile ");
+        IAction importFromFile = supplyController::importFromFile;
+        importFromFileItem.setAction(importFromFile);
+        supplyMenu.getMenuItems().add(importFromFileItem);
+
         MenuItem rollBackSupplyItem = new MenuItem();
         supplyMenu.getMenuItems().add(rollBackSupplyItem);
-        rollBackSupplyItem.setTitle(" 8 вернуться ");
-        IAction rollBackSupply = () -> rootMenu = menu;
+        rollBackSupplyItem.setTitle(" 10 вернуться ");
+        IAction rollBackSupply = () -> rootMenu = supplyMenuItem.getNextMenu();
         rollBackSupplyItem.setAction(rollBackSupply);
 
         supplyMenu.getMenuItems().add(supplyMenuItem);
@@ -121,15 +193,26 @@ public class Builder {
 
     private MenuItem getPersonMenuItem() {
         MenuItem personMenuItem = new MenuItem();
+        personMenuItem.setNextMenu(rootMenu);
         personMenuItem.setTitle("2 Person menu");
         Menu personMenu = new Menu();
 
         MenuItem createPersonItem = new MenuItem();
         createPersonItem.setTitle(" 1 Create person ");
         IAction createPerson = () -> {
-            System.out.println("Create person");
-            Long id = personService.createPerson(scan);
-            System.out.println("Person id is " + id);
+            System.out.println("введите имя");
+            String name = scan.nextLine();
+            System.out.println("введите фамилию");
+            String lastName = scan.nextLine();
+            System.out.println("введите возраст");
+            String ageString = scan.nextLine();
+            try {
+                int age = Integer.parseInt(ageString);
+                String id = personController.createPerson(name, lastName, age);
+                System.out.println("Person id is " + id);
+            } catch (NumberFormatException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
         };
         createPersonItem.setAction(createPerson);
         personMenu.getMenuItems().add(createPersonItem);
@@ -137,7 +220,11 @@ public class Builder {
         MenuItem checkInPersonItem = new MenuItem();
         checkInPersonItem.setTitle(" 2 Check in person ");
         IAction checkInPerson = () -> {
-            Long roomId = personService.checkInPerson(scan);
+            System.out.println("введите id пользователя ");
+            Long id = Long.parseLong(scan.nextLine());
+            LocalDateTime checkInDate = getDate(scan, "введите год.месяц.день.часы.минуты заселения");
+            LocalDateTime releaseDate = getDate(scan, "введите год.месяц.день.часы.минуты выселения");
+            String roomId = personController.checkInPerson(id, checkInDate, releaseDate);
             if (roomId != null) {
                 System.out.println("человек заселен в комнату под номером " + roomId);
             } else {
@@ -149,14 +236,26 @@ public class Builder {
 
         MenuItem checkOutPersonItem = new MenuItem();
         checkOutPersonItem.setTitle(" 3 Check out person ");
-        IAction checkOutPerson = () -> personService.checkOutPerson(scan);
+        IAction checkOutPerson = () -> {
+            System.out.println("введите id клиента ");
+            String personIdString = scan.nextLine();
+            System.out.println("введите id комнаты");
+            String roomIdString = scan.nextLine();
+            try {
+                Long personId = Long.parseLong(personIdString);
+                Long roomId = Long.parseLong(roomIdString);
+                System.out.println(personController.checkOutPerson(personId, roomId));
+            } catch (NumberFormatException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
+        };
         checkOutPersonItem.setAction(checkOutPerson);
         personMenu.getMenuItems().add(checkOutPersonItem);
 
         MenuItem sortAbsItem = new MenuItem();
         sortAbsItem.setTitle(" 4 Sort person by abs ");
         IAction sortAbc = () -> {
-            List<Person> persons = personService.sortAbs();
+            List<Person> persons = personController.sortAbs();
             for (Person i : persons) {
                 System.out.println(i.getId() + " " + i.getName() + " " + i.getLastName() + " " + i.getAge());
             }
@@ -166,20 +265,41 @@ public class Builder {
 
         MenuItem getNumberGuestsItem = new MenuItem();
         getNumberGuestsItem.setTitle(" 5 Show list guests ");
-        IAction getNumberGuest = () -> System.out.println(personService.getNumberGuests());
+        IAction getNumberGuest = () -> System.out.println(personController.getNumberGuests());
         getNumberGuestsItem.setAction(getNumberGuest);
         personMenu.getMenuItems().add(getNumberGuestsItem);
 
         MenuItem getTotalPriceItem = new MenuItem();
         getTotalPriceItem.setTitle(" 6 Show total price ");
-        IAction getTotalPrice = () -> System.out.println(personService.getTotalPrice(scan));
+        IAction getTotalPrice = () -> {
+            System.out.println("введите Id клиента");
+            String personIdString = scan.nextLine();
+            try {
+                Long personId = Long.parseLong(personIdString);
+                System.out.println(personController.getTotalPrice(personId));
+            } catch (NumberFormatException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
+        };
         getTotalPriceItem.setAction(getTotalPrice);
         personMenu.getMenuItems().add(getTotalPriceItem);
 
+        MenuItem importPersonFromFileItem = new MenuItem();
+        importPersonFromFileItem.setTitle(" 7 ImportPersonFromFile");
+        IAction importPersonFromFile = personController::importFromFile;
+        importPersonFromFileItem.setAction(importPersonFromFile);
+        personMenu.getMenuItems().add(importPersonFromFileItem);
+
+        MenuItem exportFileItem = new MenuItem();
+        exportFileItem.setTitle(" 8 ExportFile");
+        IAction exportFile = personController::exportFile;
+        exportFileItem.setAction(exportFile);
+        personMenu.getMenuItems().add(exportFileItem);
+
         MenuItem rollBackPersonItem = new MenuItem();
         personMenu.getMenuItems().add(rollBackPersonItem);
-        rollBackPersonItem.setTitle(" 7 вернуться ");
-        IAction rollBackPerson = () -> rootMenu = menu;
+        rollBackPersonItem.setTitle(" 9 вернуться ");
+        IAction rollBackPerson = () -> rootMenu = personMenuItem.getNextMenu();
         rollBackPersonItem.setAction(rollBackPerson);
 
         personMenu.getMenuItems().add(personMenuItem);
@@ -190,13 +310,14 @@ public class Builder {
 
     private MenuItem getRoomMenuItem() {
         MenuItem roomMenuItem = new MenuItem();
+        roomMenuItem.setNextMenu(rootMenu);
         roomMenuItem.setTitle("1 Room menu");
         Menu roomMenu = new Menu();
 
         MenuItem getRoomsItem = new MenuItem();
         getRoomsItem.setTitle(" 1 show all rooms");
         IAction getRoom = () -> {
-            List<Room> rooms = roomService.getRooms();
+            List<Room> rooms = roomController.getRooms();
             for (Room i : rooms) {
                 System.out.println("цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
             }
@@ -206,14 +327,34 @@ public class Builder {
 
         MenuItem addRoomItem = new MenuItem();
         addRoomItem.setTitle(" 2 Add room ");
-        IAction addRoom = () -> roomService.createRoom(scan);
+        IAction addRoom = () -> {
+            System.out.println("Введите статус комнаты");
+            for (Status status : Status.values()) {
+                System.out.println(status.name());
+            }
+            String statusString = scan.nextLine();
+            System.out.println("введите цену");
+            String price = scan.nextLine();
+            System.out.println("введите номер комнаты");
+            String id = scan.nextLine();
+            System.out.println("введите звезду");
+            String star = scan.nextLine();
+            System.out.println("введите вместимость");
+            String capacityRoom = scan.nextLine();
+            try {
+                Status status = Status.valueOf(statusString);
+                roomController.createRoom(status, Integer.parseInt(price), Long.parseLong(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
+            } catch (IllegalArgumentException a) {
+                System.out.println("Ошибка !!! вы ввели не тот символ");
+            }
+        };
         addRoomItem.setAction(addRoom);
         roomMenu.getMenuItems().add(addRoomItem);
 
         MenuItem getRoomsByPriceAscItem = new MenuItem();
         getRoomsByPriceAscItem.setTitle(" 3 Show list rooms sort by price asc ");
         IAction getRoomsByPriceAsc = () -> {
-            List<Room> rooms = roomService.getRoomsByPriceAsc();
+            List<Room> rooms = roomController.getRoomsByPriceAsc();
             for (Room i : rooms) {
                 System.out.println("цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
             }
@@ -224,7 +365,7 @@ public class Builder {
         MenuItem getRoomsByPriceDescItem = new MenuItem();
         getRoomsByPriceDescItem.setTitle(" 4 Show list rooms sort by price desc ");
         IAction getRoomsByPriceDesc = () -> {
-            List<Room> rooms = roomService.getRoomsByPriceDesc();
+            List<Room> rooms = roomController.getRoomsByPriceDesc();
             for (Room i : rooms) {
                 System.out.println("цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
             }
@@ -235,7 +376,7 @@ public class Builder {
         MenuItem getRoomsByStarAscItem = new MenuItem();
         getRoomsByStarAscItem.setTitle(" 5 Show list rooms sort by star asc ");
         IAction getRoomsByStarAsc = () -> {
-            List<Room> rooms = roomService.getRoomsByStarAsc();
+            List<Room> rooms = roomController.getRoomsByStarAsc();
             for (Room i : rooms) {
                 System.out.println(" количество звезд " + i.getStar() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
             }
@@ -246,7 +387,7 @@ public class Builder {
         MenuItem getRoomsByStarDescItem = new MenuItem();
         getRoomsByStarDescItem.setTitle(" 6 Show list rooms sort by star desc ");
         IAction getRoomsByStarDesc = () -> {
-            List<Room> rooms = roomService.getRoomsByStarDesc();
+            List<Room> rooms = roomController.getRoomsByStarDesc();
             for (Room i : rooms) {
                 System.out.println("количество звезд " + i.getStar() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " вместимость " + i.getCapacityRoom() + " статус " + i.getStatus());
             }
@@ -257,7 +398,7 @@ public class Builder {
         MenuItem getRoomsByCapacityRoomAscItem = new MenuItem();
         getRoomsByCapacityRoomAscItem.setTitle(" 7 Show list rooms sort by capacity asc ");
         IAction getRoomsByCapacityRoomAsc = () -> {
-            List<Room> rooms = roomService.getRoomsByCapacityRoomAsc();
+            List<Room> rooms = roomController.getRoomsByCapacityRoomAsc();
             for (Room i : rooms) {
                 System.out.println("вместимость " + i.getCapacityRoom() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " статус " + i.getStatus());
             }
@@ -268,7 +409,7 @@ public class Builder {
         MenuItem getRoomsByCapacityRoomDescItem = new MenuItem();
         getRoomsByCapacityRoomDescItem.setTitle(" 8 Show list rooms sort by capacity desc ");
         IAction getRoomsByCapacityRoomDesc = () -> {
-            List<Room> rooms = roomService.getRoomsByCapacityRoomDesc();
+            List<Room> rooms = roomController.getRoomsByCapacityRoomDesc();
             for (Room i : rooms) {
                 System.out.println("вместимость " + i.getCapacityRoom() + " цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar() + " статус " + i.getStatus());
             }
@@ -279,10 +420,9 @@ public class Builder {
         MenuItem getPersonHistoryByRoomItem = new MenuItem();
         getPersonHistoryByRoomItem.setTitle(" 9 Show person history by room id ");
         IAction getPersonHistoryByRoomId = () -> {
-            List<PersonHistoryDto> personHistoriesByRoomId = personHistoryService.getPersonHistoriesByRoomId(scan);
-            for (PersonHistoryDto i : personHistoriesByRoomId) {
-                System.out.println(i.getPersonFirstName() + " " + i.getPersonLastName() + " " + i.getCheckInDate() + " " + i.getReleaseDate());
-            }
+            System.out.println("введите room id");
+            Long roomId = ScannerUtils.getLongFromConsole(scan);
+            System.out.println(personHistoryController.getPersonHistoriesByRoomId(roomId));
         };
         getPersonHistoryByRoomItem.setAction(getPersonHistoryByRoomId);
         roomMenu.getMenuItems().add(getPersonHistoryByRoomItem);
@@ -290,7 +430,7 @@ public class Builder {
         MenuItem getAvailableRoomsByPriceAscItem = new MenuItem();
         getAvailableRoomsByPriceAscItem.setTitle(" 10 Show available rooms by price asc ");
         IAction getAvailableRoomsByPriceAsc = () -> {
-            List<Room> rooms = roomService.getAvailableRoomsByPriceAsc();
+            List<Room> rooms = roomController.getAvailableRoomsByPriceAsc();
             for (Room i : rooms) {
                 System.out.println("статус " + i.getStatus() + " цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
             }
@@ -301,7 +441,7 @@ public class Builder {
         MenuItem getAvailableRoomsByPriceDescItem = new MenuItem();
         getAvailableRoomsByPriceDescItem.setTitle(" 11 Show available rooms by price desc ");
         IAction getAvailableRoomsByPriceDesc = () -> {
-            List<Room> rooms = roomService.getAvailableRoomsByPriceDesc();
+            List<Room> rooms = roomController.getAvailableRoomsByPriceDesc();
             for (Room i : rooms) {
                 System.out.println("статус " + i.getStatus() + " цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
             }
@@ -312,7 +452,7 @@ public class Builder {
         MenuItem getAvailableRoomsByCapacityAscItem = new MenuItem();
         getAvailableRoomsByCapacityAscItem.setTitle(" 12 Show available rooms by capacity asc ");
         IAction getAvailableRoomsByCapacityAsc = () -> {
-            List<Room> rooms = roomService.getAvailableRoomsByCapacityAsc();
+            List<Room> rooms = roomController.getAvailableRoomsByCapacityAsc();
             for (Room i : rooms) {
                 System.out.println("статус " + i.getStatus() + " вместимость " + i.getCapacityRoom() + "цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
             }
@@ -323,7 +463,7 @@ public class Builder {
         MenuItem getAvailableRoomsByCapacityDescItem = new MenuItem();
         getAvailableRoomsByCapacityDescItem.setTitle(" 13 Show available rooms by capacity desc ");
         IAction getAvailableRoomsByCapacityDesc = () -> {
-            List<Room> rooms = roomService.getAvailableRoomsByCapacityDesc();
+            List<Room> rooms = roomController.getAvailableRoomsByCapacityDesc();
             for (Room i : rooms) {
                 System.out.println("статус " + i.getStatus() + " вместимость " + i.getCapacityRoom() + "цена номера " + i.getPrice() + " номер комнаты " + i.getId() + " количество звезд " + i.getStar());
             }
@@ -334,7 +474,7 @@ public class Builder {
         MenuItem getAvailableRoomsByStarAscItem = new MenuItem();
         getAvailableRoomsByStarAscItem.setTitle(" 14 Show available rooms by star asc ");
         IAction getAvailableRoomsByStarAsc = () -> {
-            List<Room> rooms = roomService.getAvailableRoomsByStarAsc();
+            List<Room> rooms = roomController.getAvailableRoomsByStarAsc();
             for (Room i : rooms) {
                 System.out.println("статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
             }
@@ -345,7 +485,7 @@ public class Builder {
         MenuItem getAvailableRoomsByStarDescItem = new MenuItem();
         getAvailableRoomsByStarDescItem.setTitle(" 15 Show available rooms by star desc ");
         IAction getAvailableRoomsByStarDesc = () -> {
-            List<Room> rooms = roomService.getAvailableRoomsByStarDesc();
+            List<Room> rooms = roomController.getAvailableRoomsByStarDesc();
             for (Room i : rooms) {
                 System.out.println("статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
             }
@@ -356,7 +496,7 @@ public class Builder {
         MenuItem getOccupiedRoomsSortByDateDescItem = new MenuItem();
         getOccupiedRoomsSortByDateDescItem.setTitle(" 16 Show occupied rooms sort By date desc ");
         IAction getOccupiedRoomsSortByDateDesc = () -> {
-            List<Room> rooms = roomService.getOccupiedRoomsSortByDateDesc();
+            List<Room> rooms = roomController.getOccupiedRoomsSortByDateDesc();
             if (!rooms.isEmpty()) {
                 for (Room i : rooms) {
                     System.out.println("дата " + i.getCheckInDate() + "статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
@@ -371,7 +511,7 @@ public class Builder {
         MenuItem getOccupiedRoomsSortByDateAscItem = new MenuItem();
         getOccupiedRoomsSortByDateAscItem.setTitle(" 17 Show occupied rooms sort By date desc ");
         IAction getOccupiedRoomsSortByDateAsc = () -> {
-            List<Room> rooms = roomService.getOccupiedRoomsSortByDateAsc();
+            List<Room> rooms = roomController.getOccupiedRoomsSortByDateAsc();
             for (Room i : rooms) {
                 System.out.println("дата " + i.getCheckInDate() + "статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
             }
@@ -381,26 +521,90 @@ public class Builder {
 
         MenuItem getAvailableRoomsByDateItem = new MenuItem();
         getAvailableRoomsByDateItem.setTitle(" 18 Show available rooms by date ");
-        IAction getAvailableRoomsByDate = () -> roomService.getAvailableRoomsByDate(scan);
+        IAction getAvailableRoomsByDate = () -> {
+            LocalDateTime localDateTime = getDate(scan, "введите год.месяц.день.часы.минуты заселения");
+            List<Room> availableRoomsByDate = roomController.getAvailableRoomsByDate(localDateTime);
+            for (Room i : availableRoomsByDate) {
+                System.out.println("дата " + i.getCheckInDate() + "статус " + i.getStatus() + " количество звезд " + i.getStar() + "цена номера " + i.getPrice() + " вместимость " + i.getCapacityRoom() + " номер комнаты " + i.getId());
+            }
+        };
         getAvailableRoomsByDateItem.setAction(getAvailableRoomsByDate);
         roomMenu.getMenuItems().add(getAvailableRoomsByDateItem);
 
         MenuItem getFreeNumbersItem = new MenuItem();
         getFreeNumbersItem.setTitle(" 19 Show list free numbers ");
-        IAction getFreeNumbers = () -> System.out.println(roomService.getFreeNumbers());
+        IAction getFreeNumbers = () -> System.out.println(roomController.getFreeNumbers());
         getFreeNumbersItem.setAction(getFreeNumbers);
         roomMenu.getMenuItems().add(getFreeNumbersItem);
 
+        MenuItem changeStatusItem = new MenuItem();
+        changeStatusItem.setTitle(" 20 changeStatus");
+        IAction changeStatus = () -> {
+            if (changeStatusAvailable.equals("true")) {
+                System.out.println("введите id комнаты ");
+                Long id = ScannerUtils.getLongFromConsole(scan);
+                System.out.println("введите статус");
+                String statusString = scan.nextLine();
+                try {
+                    Status status = Status.valueOf(statusString);
+                    System.out.println(roomController.changeStatus(id, status));
+                } catch (IllegalArgumentException a) {
+                    System.out.println("Ошибка !!! вы ввели не тот символ");
+                }
+            } else {
+                System.out.println("смена статуса запрещена !!!");
+            }
+        };
+        changeStatusItem.setAction(changeStatus);
+        roomMenu.getMenuItems().add(changeStatusItem);
+
+        MenuItem exportFileItem = new MenuItem();
+        exportFileItem.setTitle(" 21 exportFile ");
+        IAction exportFile = roomController::exportFile;
+        exportFileItem.setAction(exportFile);
+        roomMenu.getMenuItems().add(exportFileItem);
+
+        MenuItem importFromFileItem = new MenuItem();
+        importFromFileItem.setTitle(" 22 importFromFile ");
+        IAction importFromFile = roomController::importFromFile;
+        importFromFileItem.setAction(importFromFile);
+        roomMenu.getMenuItems().add(importFromFileItem);
+
         MenuItem rollBackItem = new MenuItem();
         roomMenu.getMenuItems().add(rollBackItem);
-        rollBackItem.setTitle(" 20 вернуться ");
-        IAction rollBack = () -> rootMenu = menu;
+        rollBackItem.setTitle(" 23 вернуться ");
+        IAction rollBack = () -> rootMenu = roomMenuItem.getNextMenu();
         rollBackItem.setAction(rollBack);
 
         roomMenuItem.setNextMenu(roomMenu);
         IAction roomMenuAction = () -> rootMenu = roomMenu;
         roomMenuItem.setAction(roomMenuAction);
         return roomMenuItem;
+
+    }
+
+    private MenuItem getPersonHistoryMenuItem() {
+        MenuItem personHistoryMenuItem = new MenuItem();
+        personHistoryMenuItem.setNextMenu(rootMenu);
+        personHistoryMenuItem.setTitle("4 PersonHistoryMenu");
+        Menu personHistoryMenu = new Menu();
+
+        MenuItem personHistoryExportItem = new MenuItem();
+        personHistoryExportItem.setTitle(" 1 Export ");
+        IAction personHistoryExport = personHistoryController::exportFile;
+        personHistoryExportItem.setAction(personHistoryExport);
+        personHistoryMenu.getMenuItems().add(personHistoryExportItem);
+
+        MenuItem rollBackItem = new MenuItem();
+        personHistoryMenu.getMenuItems().add(rollBackItem);
+        rollBackItem.setTitle(" 2 вернуться ");
+        IAction rollBack = () -> rootMenu = personHistoryMenuItem.getNextMenu();
+        rollBackItem.setAction(rollBack);
+
+        personHistoryMenuItem.setNextMenu(personHistoryMenu);
+        IAction roomMenuAction = () -> rootMenu = personHistoryMenu;
+        personHistoryMenuItem.setAction(roomMenuAction);
+        return personHistoryMenuItem;
     }
 
 }

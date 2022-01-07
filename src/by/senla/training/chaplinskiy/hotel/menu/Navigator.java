@@ -1,13 +1,21 @@
 package by.senla.training.chaplinskiy.hotel.menu;
 
 import java.util.List;
+import java.util.Scanner;
 
 public class Navigator {
 
+    private static Navigator navigator;
     private Menu currentMenu;
 
-    public Menu getCurrentMenu() {
-        return currentMenu;
+    private Navigator() {
+    }
+
+    public static Navigator getNavigator() {
+        if (navigator == null) {
+            navigator = new Navigator();
+        }
+        return navigator;
     }
 
     public void setCurrentMenu(Menu currentMenu) {
@@ -21,11 +29,22 @@ public class Navigator {
         }
     }
 
-    public void navigate(Integer index) {
-        List<MenuItem> menuItems = currentMenu.getMenuItems();
-        MenuItem menuItem = menuItems.get(index - 1);
-        System.out.println("Вы выбрали " + menuItem.getTitle());
-        menuItem.getAction().execute();
+    public void navigate(Scanner scan) {
+        System.out.println("Ведите нужную цифру");
+        String b = scan.nextLine();
+        try {
+            int index = Integer.parseInt(b);
+            List<MenuItem> menuItems = currentMenu.getMenuItems();
+            MenuItem menuItem = menuItems.get(index - 1);
+            System.out.println("Вы выбрали " + menuItem.getTitle());
+            menuItem.doAction();
+        } catch (NumberFormatException numberFormatException) {
+            System.out.println("Вы ввели не тот символ");
+            navigate(scan);
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            System.out.println("вы ввели цифру, которой не существует");
+            navigate(scan);
+        }
     }
 
 }

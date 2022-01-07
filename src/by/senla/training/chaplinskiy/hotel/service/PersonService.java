@@ -1,25 +1,28 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
 import by.senla.training.chaplinskiy.hotel.entity.Person;
-import by.senla.training.chaplinskiy.hotel.entity.Room;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
+import by.senla.training.chaplinskiy.hotel.exception.ServiceException;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Scanner;
 
 public interface PersonService {
 
-    Long createPerson(Scanner scanner);
+    Long createPerson(String name, String lastName, int age);
 
     List<Person> sortAbs();
 
     int getNumberGuests();
 
-    int getTotalPrice(Scanner scanner);
+    int getTotalPrice(Long personId) throws EntityNotFoundException;
 
-    void addRoom(Room room);
+    Long checkInPerson(Long id, LocalDateTime checkInDate, LocalDateTime releaseDate) throws EntityNotFoundException;
 
-    Long checkInPerson(Scanner scanner);
+    void checkOutPerson(Long personId, Long roomId) throws EntityNotFoundException, ServiceException;
 
-    void checkOutPerson(Scanner scanner);
+    void importFromFile();
+
+    void exportFile();
 
 }

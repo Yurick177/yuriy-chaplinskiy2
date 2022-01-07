@@ -1,59 +1,60 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
+import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
+import by.senla.training.chaplinskiy.hotel.converter.RoomCsvConverter;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
 import by.senla.training.chaplinskiy.hotel.entity.Room;
 import by.senla.training.chaplinskiy.hotel.entity.Status;
-import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
-import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.exception.CustomRuntimeException;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepository;
 import by.senla.training.chaplinskiy.hotel.repository.RoomRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvReader;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvWriter;
 
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 
 import static by.senla.training.chaplinskiy.hotel.entity.Status.AVAILABLE;
 import static by.senla.training.chaplinskiy.hotel.entity.Status.OCСUPIED;
-import static by.senla.training.chaplinskiy.hotel.utils.LocalDateTimeUtils.getLocalDateTimeFromString;
 
 public class RoomServiceImpl implements RoomService {
 
     private static RoomService roomService = null;
-    private final PersonHistoryRepository personHistoryRepository;
+    private final PersonHistoryService personHistoryService;
     private final RoomRepository roomRepository;
+    private final CsvWriter csvWriter;
+    private final CsvReader csvReader;
+    private final CsvConverter<Room> csvConverter;
+    @ConfigProperty(key = "roomResultPath")
+    private String roomResultPath;
+    @ConfigProperty(key = "roomPath")
+    private String roomPath;
 
     private RoomServiceImpl() {
         this.roomRepository = RoomRepositoryImpl.getRoomRepository();
-        this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
+        this.personHistoryService = PersonHistoryServiceImpl.getPersonHistoryService();
+        this.csvWriter = CsvWriter.getCsvWriter();
+        this.csvReader = CsvReader.getCsvReader();
+        this.csvConverter = RoomCsvConverter.getRoomCsvConverter();
     }
 
     public static RoomService getRoomService() {
         if (roomService == null) {
             roomService = new RoomServiceImpl();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(roomService);
         }
         return roomService;
     }
 
-    public Room createRoom(Scanner scanner) {
-        System.out.println("Введите статус комнаты");
-        for (Status status : Status.values()) {
-            System.out.println(status.name());
-        }
-        String statusString = scanner.nextLine();
-        Status status = Status.valueOf(statusString);
-        System.out.println("введите цену");
-        String price = scanner.nextLine();
-        System.out.println("введите номер комнаты");
-        String id = scanner.nextLine();
-        System.out.println("введите звезду");
-        String star = scanner.nextLine();
-        System.out.println("введите вместимость");
-        String capacityRoom = scanner.nextLine();
-
-        Room room = new Room(status, Integer.parseInt(price), Integer.parseInt(id), Integer.parseInt(star), Integer.parseInt(capacityRoom));
+    public Room createRoom(Status status, int price, long id, int star, int capacityRoom) {
+        Room room = new Room(status, price, id, star, capacityRoom);
         roomRepository.getRooms().add(room);
         return room;
     }
@@ -64,35 +65,35 @@ public class RoomServiceImpl implements RoomService {
 
     public List<Room> getRoomsByPriceAsc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getPrice);
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByPriceDesc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() < o2.getPrice() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getPrice).reversed();
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByStarAsc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = (o1, o2) -> o1.getStar() > o2.getStar() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getStar);
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByStarDesc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = (o1, o2) -> o1.getStar() < o2.getStar() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getStar).reversed();
         rooms.sort(comparator);
         return rooms;
     }
 
     public List<Room> getRoomsByCapacityRoomAsc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() > o2.getCapacityRoom() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getCapacityRoom);
         rooms.sort(comparator);
         return rooms;
 
@@ -100,7 +101,7 @@ public class RoomServiceImpl implements RoomService {
 
     public List<Room> getRoomsByCapacityRoomDesc() {
         List<Room> rooms = roomRepository.getRooms();
-        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() < o2.getCapacityRoom() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getCapacityRoom).reversed();
         rooms.sort(comparator);
         return rooms;
     }
@@ -118,42 +119,42 @@ public class RoomServiceImpl implements RoomService {
 
     public List<Room> getAvailableRoomsByPriceAsc() {
 
-        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() > o2.getPrice() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getPrice);
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByPriceDesc() {
-        Comparator<Room> comparator = (o1, o2) -> o1.getPrice() < o2.getPrice() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getPrice).reversed();
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByCapacityAsc() {
-        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() > o2.getCapacityRoom() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getCapacityRoom);
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByCapacityDesc() {
-        Comparator<Room> comparator = (o1, o2) -> o1.getCapacityRoom() < o2.getCapacityRoom() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getCapacityRoom).reversed();
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByStarAsc() {
-        Comparator<Room> comparator = (o1, o2) -> o1.getStar() > o2.getStar() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getStar);
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
     }
 
     public List<Room> getAvailableRoomsByStarDesc() {
-        Comparator<Room> comparator = (o1, o2) -> o1.getStar() < o2.getStar() ? 1 : -1;
+        Comparator<Room> comparator = Comparator.comparing(Room::getStar).reversed();
         List<Room> availableRooms = getAvailableRooms();
         availableRooms.sort(comparator);
         return availableRooms;
@@ -189,10 +190,7 @@ public class RoomServiceImpl implements RoomService {
         return freeNumbers.size();
     }
 
-    public List<Room> getAvailableRoomsByDate(Scanner scanner) {
-        System.out.println("введите год.месяц.день.часы.минуты заселения");
-        String date = scanner.nextLine();
-        LocalDateTime localDateTime = getLocalDateTimeFromString(date);
+    public List<Room> getAvailableRoomsByDate(LocalDateTime localDateTime) {
         List<Room> rooms = roomRepository.getRooms();
         List<Room> result = new ArrayList<>();
         for (Room i : rooms) {
@@ -209,7 +207,7 @@ public class RoomServiceImpl implements RoomService {
         room.setReleaseDate(releaseDate);
         room.setCheckInDate(checkInDate);
         PersonHistory personHistory = new PersonHistory(person.getId(), releaseDate, checkInDate, room.getId());
-        personHistoryRepository.addPersonHistory(personHistory);
+        personHistoryService.addPersonHistory(personHistory);
         room.getPersonHistories().add(personHistory);
 
     }
@@ -220,10 +218,26 @@ public class RoomServiceImpl implements RoomService {
         room.setStatus(AVAILABLE);
     }
 
-    public List<PersonHistory> getPersonHistoriesByRoomId(Scanner scanner) {
-        System.out.println("введите id комнаты, по которой выведется история клиентов");
-        long roomId = Long.parseLong(scanner.nextLine());
-        return personHistoryRepository.getPersonHistoriesByRoomId(roomId);
+    public void exportFile() {
+        List<Room> roomList = roomService.getRooms();
+        List<String> lines = csvConverter.getStrings(roomList);
+        csvWriter.writeLinesToFile(lines, roomResultPath);
+    }
+
+    public void importFromFile() {
+        try {
+            List<String> lineFromString = csvReader.getLinesFromFile(roomPath);
+            List<Room> roomList = csvConverter.getFromStrings(lineFromString);
+            roomRepository.addAll(roomList);
+        } catch (FileNotFoundException e) {
+            throw new CustomRuntimeException("Не правильный путь к файлу");
+        }
+    }
+
+    public void changeStatus(Long id, Status status) throws EntityNotFoundException {
+        Room roomById = roomRepository.getRoomById(id);
+        roomById.setStatus(status);
+        roomRepository.update(roomById);
     }
 
 }

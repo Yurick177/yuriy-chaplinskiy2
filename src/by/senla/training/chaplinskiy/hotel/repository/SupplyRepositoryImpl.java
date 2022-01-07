@@ -1,6 +1,7 @@
 package by.senla.training.chaplinskiy.hotel.repository;
 
 import by.senla.training.chaplinskiy.hotel.entity.Supply;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +46,7 @@ public class SupplyRepositoryImpl implements SupplyRepository {
     }
 
     public void update(Supply supply) {
-        Supply currentSupply = supplies.stream().filter(a -> a.getId().equals(supply.getId())).findFirst().orElse(null);
-        if (currentSupply != null) {
-            currentSupply.setPrice(supply.getPrice());
-        }
+        supplies.stream().filter(a -> a.getId().equals(supply.getId())).findFirst().ifPresent(currentSupply -> currentSupply.setPrice(supply.getPrice()));
     }
 
     public void remove(Long id) {
@@ -56,8 +54,19 @@ public class SupplyRepositoryImpl implements SupplyRepository {
         setSupplies(newSupply);
     }
 
-    public Supply getById(Long id) {
-        return supplies.stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
+    public Supply getById(Long id) throws EntityNotFoundException {
+        return supplies.stream().filter(a -> a.getId().equals(id)).findFirst().orElseThrow(() -> new EntityNotFoundException("Услуги по такому id не найдено "));
+    }
+
+    public List<Supply> addAll(List<Supply> supplies) {
+        for (Supply supply : supplies) {
+            if (supply.getId() == null) {
+                addSupply(supply);
+            } else {
+                update(supply);
+            }
+        }
+        return supplies;
     }
 
 }

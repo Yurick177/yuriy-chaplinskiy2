@@ -1,39 +1,51 @@
 package by.senla.training.chaplinskiy.hotel.service;
 
+import annotationconfig.ConfigProperty;
+import annotationconfig.ConfigPropertyProcessor;
+import by.senla.training.chaplinskiy.hotel.converter.CsvConverter;
+import by.senla.training.chaplinskiy.hotel.converter.PersonHistoryCsvConverter;
 import by.senla.training.chaplinskiy.hotel.dto.PersonHistoryDto;
 import by.senla.training.chaplinskiy.hotel.entity.Person;
 import by.senla.training.chaplinskiy.hotel.entity.PersonHistory;
-import by.senla.training.chaplinskiy.hotel.repository.*;
-import by.senla.training.chaplinskiy.hotel.utils.ScannerUtils;
+import by.senla.training.chaplinskiy.hotel.exception.EntityNotFoundException;
+import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepository;
+import by.senla.training.chaplinskiy.hotel.repository.PersonHistoryRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.repository.PersonRepository;
+import by.senla.training.chaplinskiy.hotel.repository.PersonRepositoryImpl;
+import by.senla.training.chaplinskiy.hotel.stringreader.CsvWriter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class PersonHistoryServiceImpl implements PersonHistoryService {
 
     private static PersonHistoryService personHistoryService = null;
     private final PersonHistoryRepository personHistoryRepository;
-    private final RoomRepository roomRepository;
     private final PersonRepository personRepository;
+    private final CsvWriter csvWriter;
+    private final CsvConverter<PersonHistory> csvConverter;
+    @ConfigProperty(key = "personHistoryResultPath")
+    private String personHistoryResultPath;
+    @ConfigProperty(key = "personHistorySize")
+    private String personHistorySize;
 
     private PersonHistoryServiceImpl() {
-        this.roomRepository = RoomRepositoryImpl.getRoomRepository();
         this.personHistoryRepository = PersonHistoryRepositoryImpl.getPersonHistoryRepository();
         this.personRepository = PersonRepositoryImpl.getPersonRepository();
+        this.csvWriter = CsvWriter.getCsvWriter();
+        this.csvConverter = PersonHistoryCsvConverter.getPersonHistoryCsvConverter();
     }
 
     public static PersonHistoryService getPersonHistoryService() {
         if (personHistoryService == null) {
             personHistoryService = new PersonHistoryServiceImpl();
+            ConfigPropertyProcessor.getConfigPropertyProcessor().processAnnotation(personHistoryService);
         }
         return personHistoryService;
     }
 
     @Override
-    public List<PersonHistoryDto> getPersonHistoriesByRoomId(Scanner scanner) {
-        System.out.println("введите room id");
-        Long roomId = ScannerUtils.getLongFromConsole(scanner);
+    public List<PersonHistoryDto> getPersonHistoriesByRoomId(Long roomId) throws EntityNotFoundException {
         List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(roomId);
         List<PersonHistoryDto> personHistoryDtos = new ArrayList<>();
         for (PersonHistory i : personHistoriesByRoomId) {
@@ -48,8 +60,23 @@ public class PersonHistoryServiceImpl implements PersonHistoryService {
             personHistoryDto.setPersonLastName(person.getLastName());
             personHistoryDtos.add(personHistoryDto);
         }
-
         return personHistoryDtos;
-
     }
+
+    public void exportFile() {
+        List<PersonHistory> personHistoryList = personHistoryRepository.getAll();
+        List<String> lines = csvConverter.getStrings(personHistoryList);
+        csvWriter.writeLinesToFile(lines, personHistoryResultPath);
+    }
+
+    public void addPersonHistory(PersonHistory personHistory) {
+        List<PersonHistory> personHistoriesByRoomId = personHistoryRepository.getPersonHistoriesByRoomId(personHistory.getRoomId());
+        int size = Integer.parseInt(personHistorySize);
+        if (personHistoriesByRoomId.size() >= size) {
+            long id = personHistoriesByRoomId.stream().mapToLong(PersonHistory::getId).min().orElse(0);
+            personHistoryRepository.removeById(id);
+        }
+        personHistoryRepository.addPersonHistory(personHistory);
+    }
+
 }
